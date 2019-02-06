@@ -400,6 +400,9 @@ func (r *Reader) initRecord() (*Record, error) <span class="cov8" title="1">{
 }
 
 // Parse parses through the content creating records.
+// TODO(morrowc): Convert this from sending back a single
+// set of Records to pipelining parsed *Record records
+// over a channel for coalation by the larger operating process.
 func Parse(rdr *Reader) (Records, error) <span class="cov8" title="1">{
         // Create the record to fill.
         var rs Records
@@ -446,6 +449,8 @@ func Parse(rdr *Reader) (Records, error) <span class="cov8" title="1">{
                                 break</span>
                         }
                 }
+                // TODO(morrowc): As with above each record created
+                // should be sent into a channel to be collected by the caller.
                 <span class="cov8" title="1">rs = append(rs, rec)</span>
         }
 

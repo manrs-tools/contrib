@@ -377,6 +377,8 @@ func Parse(rdr *Reader) (Records, error) {
 				break
 			}
 		}
+		// TODO(morrowc): As with above each record created
+		// should be sent into a channel to be collected by the caller.
 		rs = append(rs, rec)
 	}
 
