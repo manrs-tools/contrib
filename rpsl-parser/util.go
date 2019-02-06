@@ -105,5 +105,4 @@ func (r *Reader) consumeToNewline() error {
 			return err
 		}
 	}
-	return nil
 }

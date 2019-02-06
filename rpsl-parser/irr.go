@@ -381,6 +381,4 @@ func Parse(rdr *Reader) (Records, error) {
 		// should be sent into a channel to be collected by the caller.
 		rs = append(rs, rec)
 	}
-
-	return rs, nil
 }
