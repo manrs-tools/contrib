@@ -328,6 +328,9 @@ func (r *Reader) initRecord() (*Record, error) {
 }
 
 // Parse parses through the content creating records.
+// TODO(morrowc): Convert this from sending back a single
+// set of Records to pipelining parsed *Record records
+// over a channel for coalation by the larger operating process.
 func Parse(rdr *Reader) (Records, error) {
 	// Create the record to fill.
 	var rs Records
