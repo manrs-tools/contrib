@@ -1,0 +1,15 @@
+route-set:  RS-CTB-NOVA
+members:    138.0.96.0/22,
+            143.0.128.0/22,
+            167.249.164.0/22,
+            168.195.104.0/22,
+            192.141.100.0/22
+mp-members: 2804:2138::/32,
+            2804:2c04::/32,
+            2804:42bc::/32
+descr:      CTB's customer
+remarks:    ASN 264543
+mnt-by:     MAINT-AS36678
+changed:    jiangz@ctamericas.com 20180614  #21:22:22Z
+source:     RADB
+

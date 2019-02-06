@@ -1,0 +1,11 @@
+as-set:     AS-CENTRILOGIC-UK:AS-CUSTOMERS
+descr:      CentriLogic (UK Network) Customer ASNs
+members:    AS204018
+members:    AS33459
+admin-c:    CentriLogic IP Tech
+tech-c:     CentriLogic IP Tech
+notify:     iptech@centrilogic.com
+mnt-by:     MAINT-AS19693
+changed:    IPtech@centrilogic.com 20180614  #14:42:22Z
+source:     RADB
+

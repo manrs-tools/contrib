@@ -1,0 +1,107 @@
+aut-num:       AS372
+as-name:       UNSPECIFIED
+descr:         Nasa Science Network (FIX-West)
+admin-c:       Not available
+tech-c:        See MAINT-AS372
+mnt-by:        MAINT-AS372
+changed:       DB-admin@merit.edu 19950201
+source:        RADB
+
+aut-num:       AS1263
+as-name:       NSN-TEST-AS
+descr:         NSN-TEST-AS
+admin-c:       Not available
+tech-c:        See MAINT-AS1263
+mnt-by:        MAINT-AS1263
+changed:       DB-admin@merit.edu 19950201
+source:        RADB
+
+route:         167.96.0.0/16
+descr:         Cyprus Minerals Company
+               9100 East Mineral Circle
+               M.S. 257N
+               Englewood
+               CO 80112, USA
+origin:        AS2900
+member-of:     RS-COMM_NSFNET
+mnt-by:        MAINT-AS2900
+changed:       nsfnet-admin@merit.edu 19950506
+source:        RADB
+
+route:         204.155.160.0/20
+descr:         Phoenix Newspapers, Inc.
+               P.O. Box 1950
+               Phoenix
+               AZ 85001, USA
+origin:        AS2900
+member-of:     RS-COMM_NSFNET
+mnt-by:        MAINT-AS2900
+changed:       nsfnet-admin@merit.edu 19950507
+source:        RADB
+
+route:         168.158.0.0/16
+descr:         Sprint
+               2490 Sunrise Valley Drive
+               Reston
+               VA 22096, USA
+origin:        AS2900
+member-of:     RS-COMM_NSFNET
+mnt-by:        MAINT-AS2900
+changed:       nsfnet-admin@merit.edu 19950506
+source:        RADB
+
+route:         192.150.37.0/24
+descr:         NASA Ames Research Center
+               MS 233-8
+               Moffett Field
+               CA 95014, USA
+origin:        AS1263
+member-of:     RS-COMM_NSFNET
+mnt-by:        MAINT-AS1263
+changed:       nsfnet-admin@merit.edu 19950326
+source:        RADB
+
+route:         144.252.0.0/16
+descr:         Army Research Laboratory
+               Myer Center
+               Fort Monmouth
+               NJ 07703-5000, USA
+origin:        AS668
+member-of:     RS-COMM_NSFNET
+mnt-by:        MAINT-AS668
+changed:       nsfnet-admin@merit.edu 19940714
+source:        RADB
+
+route:         153.91.0.0/16
+descr:         Central Missouri State University
+               Humphreys 208
+               Warrensburg
+               MO 64093, USA
+origin:        AS2572
+member-of:     RS-COMM_NSFNET
+mnt-by:        MAINT-AS2572
+changed:       nsfnet-admin@merit.edu 19950506
+source:        RADB
+
+route:         192.153.92.0/24
+descr:         US Army Concepts Analysis Agency
+               8120 Woodmont Avenue
+               Bethesda
+               MD 20814, USA
+origin:        AS668
+member-of:     RS-COMM_NSFNET
+mnt-by:        MAINT-AS668
+changed:       nsfnet-admin@merit.edu 19940714
+source:        RADB
+
+route:         198.29.40.0/24
+descr:         Naval Electronic Systems Engineering Center
+               4600 Marriott Drive
+               Charleston
+               SC 29418-6504, USA
+origin:        AS22
+member-of:     RS-COMM_NSFNET
+mnt-by:        MAINT-AS22
+changed:       nsfnet-admin@merit.edu 19950505
+source:        RADB
+

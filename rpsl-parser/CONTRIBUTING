@@ -1,0 +1,13 @@
+Want to contribute? Great! First, read this page.
+
+### Before you contribute
+Please be sure that you link the pre-commit git hook at:
+  ./.githooks/pre-commit
+
+into your cloned code's .git/hooks directory. The pre-commit hook creates
+a coverage report upon commit for the code in this project.
+
+### Code reviews
+All submissions, including submissions by project members, require review. We
+use Github pull requests for this purpose, and the Github CODEOWNERS configuration
+automatically adds reviewers to all pull requests at creation time.

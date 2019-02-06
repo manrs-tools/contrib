@@ -1,0 +1,8 @@
+route6:     2001:1988::/32
+descr:      NextWeb: IPv6
+origin:     AS16467
+notify:     routing@nextweb.net
+mnt-by:     MAINT-AS16467
+changed:    charlie@nextweb.net 20041019  #17:24:25(UTC)
+source:     RADB
+

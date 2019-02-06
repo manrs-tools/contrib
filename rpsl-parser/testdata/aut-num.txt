@@ -1,0 +1,8 @@
+aut-num:       AS372
+as-name:       UNSPECIFIED
+descr:         Nasa Science Network (FIX-West)
+admin-c:       Not available
+tech-c:        See MAINT-AS372
+mnt-by:        MAINT-AS372
+changed:       DB-admin@merit.edu 19950201
+source:        RADB

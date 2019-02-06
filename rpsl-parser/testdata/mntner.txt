@@ -1,0 +1,11 @@
+mntner:     MAINT-AS263910
+descr:      Gurisat Gurinet Ltda Me
+admin-c:    George Uebe
+tech-c:     George Uebe
+upd-to:     supervisorinternet@gurisat.com.br
+mnt-nfy:    supervisorinternet@gurisat.com.br
+auth:       CRYPT-PW HIDDENCRYPTPW
+mnt-by:     MAINT-AS263910
+changed:    george@gurisat.com.br 20180614  #17:34:17Z
+source:     RADB
+

@@ -1,0 +1,12 @@
+route:         167.96.0.0/16
+descr:         Cyprus Minerals Company
+               9100 East Mineral Circle
+               M.S. 257N
+               Englewood
+               CO 80112, USA
+origin:        AS2900
+member-of:     RS-COMM_NSFNET
+mnt-by:        MAINT-AS2900
+changed:       nsfnet-admin@merit.edu 19950506
+source:        RADB
+
