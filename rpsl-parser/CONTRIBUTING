@@ -5,7 +5,9 @@ Please be sure that you link the pre-commit git hook at:
   ./.githooks/pre-commit
 
 into your cloned code's .git/hooks directory. The pre-commit hook creates
-a coverage report upon commit for the code in this project.
+a coverage report upon commit for the code in this project. Additionally,
+the coverage_badge is created with:
+  https://github.com/jpoles1/gopherbadger
 
 ### Code reviews
 All submissions, including submissions by project members, require review. We
