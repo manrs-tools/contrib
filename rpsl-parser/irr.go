@@ -37,9 +37,9 @@ type Record struct {
 
 func (r *Record) String() string {
 	var res []string
-	res = append(res, fmt.Sprintf("Type:\t%s", r.Type))
+	res = append(res, fmt.Sprintf("Type:\t%v", r.Type))
 	for k, v := range r.Fields {
-		res = append(res, fmt.Sprintf("%s:\t%s", k, v))
+		res = append(res, fmt.Sprintf("%v:\t%v", k, v))
 	}
 	return strings.Join(res, "\n")
 }
