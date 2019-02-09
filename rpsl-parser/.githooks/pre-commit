@@ -59,7 +59,8 @@ then
   go tool cover -html=coverage.out -o=coverage.html
   # Remove trailing whitepsace from coverage report.
   sed -i 's/[	 ]*[	 ]$//' coverage.html 
-  git add coverage.html
+  cd ..
+  git add *coverage.html
 fi
 
 # If there are whitespace errors, print the offending file names and fail.
