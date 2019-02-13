@@ -35,6 +35,15 @@ type Record struct {
 	Fields map[KeyWord]string // Fields is the whole record indexed by key.
 }
 
+func (r *Record) String() string {
+	var res []string
+	res = append(res, fmt.Sprintf("Type:\t%v", r.Type))
+	for k, v := range r.Fields {
+		res = append(res, fmt.Sprintf("%v:\t%v", k, v))
+	}
+	return strings.Join(res, "\n")
+}
+
 type Records []*Record
 
 // NewReader instantiates a new reader object.

@@ -717,6 +717,20 @@ func TestParse(t *testing.T) {
 		}},
 		rec: 1,
 	}, {
+		desc: "Success with a plus-sign continuation character",
+		file: "route-set.txt",
+		want: &Record{Type: ROUTESET, Fields: map[KeyWord]string{
+			ROUTESET:  "RS-CTB-NOVA",
+			MEMBERS:   "138.0.96.0/22,\n            143.0.128.0/22,\n            167.249.164.0/22,\n            168.195.104.0/22,\n            192.141.100.0/22,\n+\n            192.141.100.0/24",
+			MPMEMBERS: "2804:2138::/32,\n            2804:2c04::/32,\n            2804:42bc::/32",
+			DESCR:     "CTB's customer",
+			REMARKS:   "ASN 264543",
+			MNTBY:     "MAINT-AS36678",
+			CHANGED:   "jiangz@ctamericas.com 20180614  #21:22:22Z",
+			SOURCE:    "RADB",
+		}},
+		rec: 0,
+	}, {
 		desc:    "Fail - Illegal Keyword",
 		file:    "illegal.txt",
 		wantErr: true,
@@ -743,7 +757,7 @@ func TestParse(t *testing.T) {
 			t.Errorf("[%v]: did not get error, expected one.", test.desc)
 		case err == nil:
 			if !cmp.Equal(got[test.rec], test.want) {
-				t.Errorf("[%v]: got/want mismatch: %v/%v", test.desc, got[test.rec], test.want)
+				t.Errorf("[%v]: got/want mismatch:\n%s", test.desc, cmp.Diff(got[test.rec], test.want))
 			}
 		}
 

@@ -54,9 +54,9 @@
 			<div id="nav">
 				<select id="files">
 
-				<option value="file0">./irr.go (93.2%)</option>
+				<option value="file0">./irr.go (91.0%)</option>
 
-				<option value="file1">./util.go (82.9%)</option>
+				<option value="file1">./util.go (85.0%)</option>
 
 				</select>
 			</div>
@@ -105,6 +105,15 @@ type Reader struct {
 type Record struct {
         Type   KeyWord
         Fields map[KeyWord]string // Fields is the whole record indexed by key.
+}
+
+func (r *Record) String() string <span class="cov0" title="0">{
+        var res []string
+        res = append(res, fmt.Sprintf("Type:\t%v", r.Type))
+        for k, v := range r.Fields </span><span class="cov0" title="0">{
+                res = append(res, fmt.Sprintf("%v:\t%v", k, v))
+        }</span>
+        <span class="cov0" title="0">return strings.Join(res, "\n")</span>
 }
 
 type Records []*Record
@@ -453,8 +462,6 @@ func Parse(rdr *Reader) (Records, error) <span class="cov8" title="1">{
                 // should be sent into a channel to be collected by the caller.
                 <span class="cov8" title="1">rs = append(rs, rec)</span>
         }
-
-        <span class="cov0" title="0">return rs, nil</span>
 }
 </pre>
 
@@ -565,7 +572,6 @@ func (r *Reader) consumeToNewline() error <span class="cov8" title="1">{
                         return err
                 }</span>
         }
-        <span class="cov0" title="0">return nil</span>
 }
 </pre>
 
