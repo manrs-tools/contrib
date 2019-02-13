@@ -336,43 +336,37 @@ func (r *Reader) initRecord() (*Record, error) {
 	return rec, nil
 }
 
-// Parse parses through the content creating records.
-// TODO(morrowc): Convert this from sending back a single
-// set of Records to pipelining parsed *Record records
-// over a channel for coalation by the larger operating process.
-func Parse(rdr *Reader) (Records, error) {
-	// Create the record to fill.
-	var rs Records
-
+// Parse parses through the content sending resulting records into a channel to the caller.
+func Parse(rdr *Reader, rc chan<- *Record) error {
 	// Read the file content, return all accumulated records.
 	// Return in case of parsing errors on record/keyword type.
 	// Return in case of reading error.
 	for {
 		rec, err := rdr.initRecord()
 		if err != nil {
-			return rs, err
+			return fmt.Errorf("failed to init the first Record: %v", err)
 		}
 
 		for {
 			key, literal := rdr.findKey()
 			if key == ILLEGAL {
-				return rs, fmt.Errorf("failed to read a keyword found unexpected: %v\n", literal)
+				return fmt.Errorf("failed to read a keyword found unexpected: %v\n", literal)
 			}
 
 			err := rdr.consumeColon()
 			if err != nil {
-				rs = append(rs, rec)
-				return rs, err
+				rc <- rec
+				return fmt.Errorf("failed to consume a key's colon separator: %v", err)
 			}
 
 			val, re, err := rdr.readValue()
 			if err != nil {
 				rec.Fields[key] = val
-				rs = append(rs, rec)
+				rc <- rec
 				if err == io.EOF {
-					return rs, err
+					return fmt.Errorf("found an EOF while reading a value: %v", err)
 				}
-				return rs, err
+				return fmt.Errorf("failed to read a value: %v", err)
 			}
 
 			// Add the key/value to the record as well.
@@ -386,8 +380,7 @@ func Parse(rdr *Reader) (Records, error) {
 				break
 			}
 		}
-		// TODO(morrowc): As with above each record created
-		// should be sent into a channel to be collected by the caller.
-		rs = append(rs, rec)
+		rc <- rec
 	}
+	return nil
 }

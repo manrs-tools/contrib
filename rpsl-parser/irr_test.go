@@ -746,10 +746,24 @@ func TestParse(t *testing.T) {
 		}
 
 		r := NewReader(fd)
-		got, err := Parse(r)
+		rc := make(chan *Record, 10)
+
+		go func() error {
+			err := Parse(r, rc)
+			if err != nil {
+				return err
+			}
+			return nil
+		}()
 		if err == io.EOF {
 			err = nil
 		}
+
+		var got []*Record
+		for i := 0; i <= test.rec; i++ {
+			got = append(got, <-rc)
+		}
+
 		switch {
 		case err != nil && !test.wantErr:
 			t.Errorf("[%v]: got error when not expecting one: %v", test.desc, err)

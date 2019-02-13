@@ -408,60 +408,53 @@ func (r *Reader) initRecord() (*Record, error) <span class="cov8" title="1">{
         <span class="cov8" title="1">return rec, nil</span>
 }
 
-// Parse parses through the content creating records.
-// TODO(morrowc): Convert this from sending back a single
-// set of Records to pipelining parsed *Record records
-// over a channel for coalation by the larger operating process.
-func Parse(rdr *Reader) (Records, error) <span class="cov8" title="1">{
-        // Create the record to fill.
-        var rs Records
-
+// Parse parses through the content sending resulting records into a channel to the caller.
+func Parse(rdr *Reader, rc chan&lt;- *Record) error {
         // Read the file content, return all accumulated records.
         // Return in case of parsing errors on record/keyword type.
         // Return in case of reading error.
-        for </span><span class="cov8" title="1">{
+        for {
                 rec, err := rdr.initRecord()
-                if err != nil </span><span class="cov8" title="1">{
-                        return rs, err
-                }</span>
+                if err != nil {
+                        return fmt.Errorf("failed to init the first Record: %v", err)
+                }
 
-                <span class="cov8" title="1">for </span><span class="cov8" title="1">{
+                for</span><span class="cov8" title="1"> {
                         key, literal := rdr.findKey()
-                        if key == ILLEGAL </span><span class="cov0" title="0">{
-                                return rs, fmt.Errorf("failed to read a keyword found unexpected: %v\n", literal)
-                        }</span>
+                        if key == ILL</span><span class="cov8" title="1">EGAL {
+                                return fmt.Errorf("failed to read a keyword found unexpected: %v\n", literal)
+                        </span>}
 
-                        <span class="cov8" title="1">err := rdr.consumeColon()
-                        if err != nil </span><span class="cov0" title="0">{
-                                rs = append(rs, rec)
-                                return rs, err
+                <span class="cov8" title="1">        err</span><span class="cov8" title="1"> := rdr.consumeColon()
+                        if err != nil {
+                                rc &lt;- rec
+</span>                                return fmt.Errorf("failed to consume a key's colon separator: %v", err)
                         }</span>
 
                         <span class="cov8" title="1">val, re, err := rdr.readValue()
-                        if err != nil </span><span class="cov8" title="1">{
+                        if err != nil </span><span class="cov0" title="0">{
                                 rec.Fields[key] = val
-                                rs = append(rs, rec)
-                                if err == io.EOF </span><span class="cov8" title="1">{
-                                        return rs, err
-                                }</span>
-                                <span class="cov0" title="0">return rs, err</span>
+                                rc &lt;- rec
+                                </span>if err == io.EOF {
+                                        return fmt.Errorf("found an EOF while reading a value: %v", err)
+                        <span class="cov8" title="1">        }
+                                return fmt.Er</span><span class="cov8" title="1">rorf("failed to read a value: %v", err)
                         }
 
-                        // Add the key/value to the record as well.
-                        <span class="cov8" title="1">if _, ok := rec.Fields[key]; !ok </span><span class="cov8" title="1">{
-                                rec.Fields[key] = val
-                        }</span><span class="cov8" title="1"> else {
-                                rec.Fields[key] = fmt.Sprintf("%v %v", rec.Fields[key], val)
-                        }</span>
-
-                        <span class="cov8" title="1">if re </span><span class="cov8" title="1">{
-                                break</span>
+                        // Add the key/val</span><span class="cov8" title="1">ue to the record as well.
+                        if _, ok := rec.Fields[key]; !ok {
+                                r</span>ec.Fields[key] = val
+                        }<span class="cov0" title="0"> else {
+</span>                                rec.Fields[key] = fmt.Sprintf("%v %v", rec.Fields[key], val)
                         }
+
+                        <span class="cov8" title="1">if re {
+</span>                                break
+                        }</span><span class="cov8" title="1">
                 }
-                // TODO(morrowc): As with above each record created
-                // should be sent into a channel to be collected by the caller.
-                <span class="cov8" title="1">rs = append(rs, rec)</span>
+                rc</span> &lt;- rec
         }
+        re<span class="cov8" title="1">turn n</span><span class="cov8" title="1">il
 }
 </pre>
 
