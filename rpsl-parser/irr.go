@@ -382,5 +382,4 @@ func Parse(rdr *Reader, rc chan<- *Record) error {
 		}
 		rc <- rec
 	}
-	return nil
 }
