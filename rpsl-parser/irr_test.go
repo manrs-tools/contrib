@@ -17,7 +17,6 @@ package rpsl
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -759,9 +758,6 @@ func TestParse(t *testing.T) {
 		err = func() error {
 			err := Parse(r, rc)
 			if err != nil {
-				if err != io.EOF {
-					fmt.Printf("[%v]: Got error on parse: %v\n", test.desc, err)
-				}
 				close(rc)
 				return err
 			}
