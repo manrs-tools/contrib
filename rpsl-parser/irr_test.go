@@ -760,6 +760,5 @@ func TestParse(t *testing.T) {
 				t.Errorf("[%v]: got/want mismatch:\n%s", test.desc, cmp.Diff(got[test.rec], test.want))
 			}
 		}
-
 	}
 }
