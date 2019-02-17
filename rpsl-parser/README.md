@@ -1,4 +1,6 @@
 ![coverage](./coverage_badge.png "Coverage")
+![buildstatus](https://api.travis-ci.org/morrowc/contrib.svg?branch=master "BuildStatus")
+![goreportcard](https://goreportcard.com/badge/github.com/manrs-tools/contrib "Go Report Card")
 
 A library to parse IRR database data.
 
