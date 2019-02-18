@@ -16,7 +16,7 @@ limitations under the License.
 package rpsl
 
 import (
-	"io"
+	"fmt"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -672,6 +672,7 @@ func TestParse(t *testing.T) {
 		file    string
 		want    *Record
 		rec     int
+		recs    int
 		wantErr bool
 	}{{
 		desc: "Success with single values only",
@@ -686,7 +687,8 @@ func TestParse(t *testing.T) {
 			CHANGED: "DB-admin@merit.edu 19950201",
 			SOURCE:  "RADB",
 		}},
-		rec: 0,
+		rec:  0,
+		recs: 1,
 	}, {
 		desc: "Success - with double value (members)",
 		file: "as-set.txt",
@@ -701,7 +703,8 @@ func TestParse(t *testing.T) {
 			NOTIFY:  "iptech@centrilogic.com",
 			SOURCE:  "RADB",
 		}},
-		rec: 0,
+		rec:  0,
+		recs: 1,
 	}, {
 		desc: "Success with two records read",
 		file: "two-records.txt",
@@ -715,7 +718,8 @@ func TestParse(t *testing.T) {
 			CHANGED: "DB-admin@merit.edu 19950201",
 			SOURCE:  "RADB",
 		}},
-		rec: 1,
+		rec:  1,
+		recs: 2,
 	}, {
 		desc: "Success with a plus-sign continuation character",
 		file: "route-set.txt",
@@ -729,11 +733,8 @@ func TestParse(t *testing.T) {
 			CHANGED:   "jiangz@ctamericas.com 20180614  #21:22:22Z",
 			SOURCE:    "RADB",
 		}},
-		rec: 0,
-	}, {
-		desc:    "Fail - Illegal Keyword",
-		file:    "illegal.txt",
-		wantErr: true,
+		rec:  0,
+		recs: 1,
 	}}
 
 	for _, test := range tests {
@@ -746,10 +747,23 @@ func TestParse(t *testing.T) {
 		}
 
 		r := NewReader(fd)
-		got, err := Parse(r)
-		if err == io.EOF {
+		rc := make(chan *Record, 10)
+
+		// Run the parse routine, pull the Records off the channel.
+		Parse(r, rc)
+		close(rc)
+
+		if strings.HasSuffix(fmt.Sprintf("%s", err), "EOF") {
 			err = nil
 		}
+
+		var got []*Record
+		if err == nil {
+			for i := 0; i < test.recs; i++ {
+				got = append(got, <-rc)
+			}
+		}
+
 		switch {
 		case err != nil && !test.wantErr:
 			t.Errorf("[%v]: got error when not expecting one: %v", test.desc, err)

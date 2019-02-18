@@ -54,7 +54,7 @@
 			<div id="nav">
 				<select id="files">
 
-				<option value="file0">./irr.go (91.0%)</option>
+				<option value="file0">./irr.go (89.4%)</option>
 
 				<option value="file1">./util.go (85.0%)</option>
 
@@ -94,6 +94,8 @@ import (
         "fmt"
         "io"
         "strings"
+
+        glog "github.com/golang/glog"
 )
 
 // Reader is a struct to manage access to the irr database file.
@@ -408,43 +410,43 @@ func (r *Reader) initRecord() (*Record, error) <span class="cov8" title="1">{
         <span class="cov8" title="1">return rec, nil</span>
 }
 
-// Parse parses through the content creating records.
-// TODO(morrowc): Convert this from sending back a single
-// set of Records to pipelining parsed *Record records
-// over a channel for coalation by the larger operating process.
-func Parse(rdr *Reader) (Records, error) <span class="cov8" title="1">{
-        // Create the record to fill.
-        var rs Records
-
+// Parse parses through the content sending resulting records into a channel to the caller.
+func Parse(rdr *Reader, rc chan&lt;- *Record) <span class="cov8" title="1">{
         // Read the file content, return all accumulated records.
         // Return in case of parsing errors on record/keyword type.
         // Return in case of reading error.
         for </span><span class="cov8" title="1">{
                 rec, err := rdr.initRecord()
                 if err != nil </span><span class="cov8" title="1">{
-                        return rs, err
+                        glog.Infof("failed to init the first Record: %v", err)
+                        return
                 }</span>
 
                 <span class="cov8" title="1">for </span><span class="cov8" title="1">{
                         key, literal := rdr.findKey()
                         if key == ILLEGAL </span><span class="cov0" title="0">{
-                                return rs, fmt.Errorf("failed to read a keyword found unexpected: %v\n", literal)
-                        }</span>
+                                glog.Infof("failed to read a keyword found unexpected: %v\n", literal)
+                                break</span>
+                        }
 
                         <span class="cov8" title="1">err := rdr.consumeColon()
                         if err != nil </span><span class="cov0" title="0">{
-                                rs = append(rs, rec)
-                                return rs, err
-                        }</span>
+                                rc &lt;- rec
+                                glog.Infof("failed to consume a key's colon separator: %v", err)
+                                break</span>
+                        }
 
                         <span class="cov8" title="1">val, re, err := rdr.readValue()
                         if err != nil </span><span class="cov8" title="1">{
                                 rec.Fields[key] = val
-                                rs = append(rs, rec)
+                                rc &lt;- rec
                                 if err == io.EOF </span><span class="cov8" title="1">{
-                                        return rs, err
+                                        // EOF in a read means moving to the next file.
+                                        glog.Infof("found an EOF while reading a value: %v", err)
+                                        return
                                 }</span>
-                                <span class="cov0" title="0">return rs, err</span>
+                                <span class="cov0" title="0">glog.Infof("failed to read a value: %v", err)
+                                return</span>
                         }
 
                         // Add the key/value to the record as well.
@@ -458,9 +460,7 @@ func Parse(rdr *Reader) (Records, error) <span class="cov8" title="1">{
                                 break</span>
                         }
                 }
-                // TODO(morrowc): As with above each record created
-                // should be sent into a channel to be collected by the caller.
-                <span class="cov8" title="1">rs = append(rs, rec)</span>
+                <span class="cov8" title="1">rc &lt;- rec</span>
         }
 }
 </pre>
