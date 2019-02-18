@@ -12,13 +12,13 @@ Example usage: (parse the contents of the file: /var/tmp/radb.db)
 import rpsl "github.com/manrs-tools/contrib/rpsl-parser"
 
 func main() {
-  fd, err := os.Open("/var/tmp/radb.db")
+	fd, err := os.Open("/var/tmp/radb.db")
 	if err != nil {
 		fmt.Printf("Failed to open irrFile(%v): %v\n", *irrFile, err)
 		return
 	}
-  rdr := rpsl.NewReader(fd)
-  r, _, err := rdr.Read()
+	rdr := rpsl.NewReader(fd)
+	r, _, err := rdr.Read()
 	if err != nil {
 		fmt.Printf("failed to readRune: %v\n", err)
 		return
@@ -34,11 +34,11 @@ func main() {
 		return
 	}
 
-  var rec *rpsl.Record
-  rc := make(chan *rpsl.Record)
+	var rec *rpsl.Record
+	rc := make(chan *rpsl.Record)
 
-  // Start to Parse() the reader contents, report results up the channel (rc).
-  go rpsl.Parse(rdr, rc)
+	// Start to Parse() the reader contents, report results up the channel (rc).
+	go rpsl.Parse(rdr, rc)
 
 	for rec := range  rc {
 		fmt.Printf("Record type(%v):\n", rec.Type)
