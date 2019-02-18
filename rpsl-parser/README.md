@@ -9,7 +9,7 @@ Reads an IRR/RPSL file, parsing each record into a returned slice of structs.
 Example usage: (parse the contents of the file: /var/tmp/radb.db)
 
 ```golang
-import irr
+import rpsl "github.com/manrs-tools/contrib/rpsl-parser"
 
 func main() {
   fd, err := os.Open("/var/tmp/radb.db")
@@ -17,7 +17,7 @@ func main() {
 		fmt.Printf("Failed to open irrFile(%v): %v\n", *irrFile, err)
 		return
 	}
-  rdr := irr.NewReader(fd)
+  rdr := rpsl.NewReader(fd)
   r, _, err := rdr.Read()
 	if err != nil {
 		fmt.Printf("failed to readRune: %v\n", err)
@@ -34,16 +34,13 @@ func main() {
 		return
 	}
 
-	recs, err := irr.Parse(rdr)
-	if err != nil {
-		if err != io.EOF {
-			fmt.Printf("Error in parsing(%v): %v\n", *irrFile, err)
-			return
-		}
-		fmt.Printf("Reached end of file with: %v records\n", len(recs))
-	}
+  var rec *rpsl.Record
+  rc := make(chan *rpsl.Record)
 
-	for _, rec := range recs {
+  // Start to Parse() the reader contents, report results up the channel (rc).
+  go rpsl.Parse(rdr, rc)
+
+	for rec := range  rc {
 		fmt.Printf("Record type(%v):\n", rec.Type)
 		for k, v := range rec.Fields {
 			fmt.Printf("Key(%v)\t-> Val(%v)\n", k, v)
