@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"io"
 	"strings"
+
+	glog "github.com/golang/glog"
 )
 
 // Reader is a struct to manage access to the irr database file.
@@ -337,26 +339,29 @@ func (r *Reader) initRecord() (*Record, error) {
 }
 
 // Parse parses through the content sending resulting records into a channel to the caller.
-func Parse(rdr *Reader, rc chan<- *Record) error {
+func Parse(rdr *Reader, rc chan<- *Record) {
 	// Read the file content, return all accumulated records.
 	// Return in case of parsing errors on record/keyword type.
 	// Return in case of reading error.
 	for {
 		rec, err := rdr.initRecord()
 		if err != nil {
-			return fmt.Errorf("failed to init the first Record: %v", err)
+			glog.Infof("failed to init the first Record: %v", err)
+			return
 		}
 
 		for {
 			key, literal := rdr.findKey()
 			if key == ILLEGAL {
-				return fmt.Errorf("failed to read a keyword found unexpected: %v\n", literal)
+				glog.Infof("failed to read a keyword found unexpected: %v\n", literal)
+				break
 			}
 
 			err := rdr.consumeColon()
 			if err != nil {
 				rc <- rec
-				return fmt.Errorf("failed to consume a key's colon separator: %v", err)
+				glog.Infof("failed to consume a key's colon separator: %v", err)
+				break
 			}
 
 			val, re, err := rdr.readValue()
@@ -364,9 +369,12 @@ func Parse(rdr *Reader, rc chan<- *Record) error {
 				rec.Fields[key] = val
 				rc <- rec
 				if err == io.EOF {
-					return fmt.Errorf("found an EOF while reading a value: %v", err)
+					// EOF in a read means moving to the next file.
+					glog.Infof("found an EOF while reading a value: %v", err)
+					return
 				}
-				return fmt.Errorf("failed to read a value: %v", err)
+				glog.Infof("failed to read a value: %v", err)
+				return
 			}
 
 			// Add the key/value to the record as well.

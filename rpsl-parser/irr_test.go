@@ -735,11 +735,6 @@ func TestParse(t *testing.T) {
 		}},
 		rec:  0,
 		recs: 1,
-	}, {
-		desc:    "Fail - Illegal Keyword",
-		file:    "illegal.txt",
-		wantErr: true,
-		recs:    1,
 	}}
 
 	for _, test := range tests {
@@ -755,14 +750,8 @@ func TestParse(t *testing.T) {
 		rc := make(chan *Record, 10)
 
 		// Run the parse routine, pull the Records off the channel.
-		err = func() error {
-			err := Parse(r, rc)
-			if err != nil {
-				close(rc)
-				return err
-			}
-			return nil
-		}()
+		Parse(r, rc)
+		close(rc)
 
 		if strings.HasSuffix(fmt.Sprintf("%s", err), "EOF") {
 			err = nil
