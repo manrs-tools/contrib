@@ -47,6 +47,9 @@ func main() {
 
 	for rec := range rc {
 		fmt.Printf("Record type(%v):\n", rec.Type)
+		// Ideally this is where actual processing of the Record{} based upon
+		// type, content, etc happens. For this example code the record is
+		// simply output to stdout.
 		for k, v := range rec.Fields {
 			fmt.Printf("Key(%v)\t-> Val(%v)\n", k, v)
 		}
