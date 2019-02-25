@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 // irrParser loads the content of IRR database backups, parses the content
 // with the rpsl-parser library and generates loadable data for indexed
 // queries of the irr content.
@@ -94,19 +95,8 @@ func parseFile(ic <-chan string, rc chan<- *rpsl.Record, ec chan<- bool) {
 			continue
 		}
 
-		// Read the first character at this point, validate it's a letter character.
-		r, _, err := rdr.Read()
-		if err != nil {
-			glog.Infof("Failed to readRune: %v\n", err)
-			continue
-		}
-		err = rdr.Unread()
-		if err != nil {
-			glog.Infof("Failed to unRead a rune(%v): %v\n", r, err)
-			continue
-		}
-
 		// The file must start with a letter, all IRR records start with a letter character.
+		r := rdr.Peek()
 		if !rpsl.IsLetter(r) {
 			glog.Infof("The first character read(%v) is not a letter, file unparsable.\n", string(r))
 			// Add 2 more chars so finding the problem is more possible.

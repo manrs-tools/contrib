@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 // Tests for the util.go utilities.
 package rpsl
 
@@ -202,7 +203,7 @@ func TestConsumeComment(t *testing.T) {
 	for _, test := range tests {
 		r := NewReader(strings.NewReader(test.input))
 		err := r.ConsumeComment()
-		got := r.peek()
+		got := r.Peek()
 		switch {
 		case err != nil && !test.wantErr:
 			t.Errorf("[%v]: got error when not expecting one: %v", test.desc, err)
