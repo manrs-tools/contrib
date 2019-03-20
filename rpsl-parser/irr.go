@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 // Package irr implements a parser for IRR/RPSL data.
 package rpsl
 
@@ -273,10 +274,10 @@ func (r *Reader) readValue() (string, bool, error) {
 
 		switch {
 		// newline and letter, return value.
-		case IsNewline(ch) && IsLetter(r.peek()):
+		case IsNewline(ch) && IsLetter(r.Peek()):
 			return buf.String(), false, nil
 			// newline and newline, return value and end-of-record.
-		case IsNewline(ch) && (IsNewline(r.peek()) || r.peek() == eof):
+		case IsNewline(ch) && (IsNewline(r.Peek()) || r.Peek() == eof):
 			// read and discard the current newline and next newline (EOR).
 			_, _, err := r.Read()
 			if err != nil {
@@ -289,8 +290,8 @@ func (r *Reader) readValue() (string, bool, error) {
 	}
 }
 
-// Look one character ahead, and return to the starting position.
-func (r *Reader) peek() rune {
+// Peek looks one character ahead, and return to the starting position.
+func (r *Reader) Peek() rune {
 	ch, _, err := r.Read()
 	// Any errror during peek, which is reading an already open file, is 'EOF', return eof.
 	if err != nil {

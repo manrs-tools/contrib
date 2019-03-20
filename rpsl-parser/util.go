@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 package rpsl
 
 // IsLetter validates that the rune is a letter.
@@ -41,7 +42,7 @@ func IsOctothorpe(ch rune) bool { return (ch == octothorpe) }
 
 // ConsumeComment reads a full octothorpe intiated comment, and discards it.
 func (r *Reader) ConsumeComment() error {
-	if IsOctothorpe(r.peek()) {
+	if IsOctothorpe(r.Peek()) {
 		_, _, err := r.Read()
 		if err != nil {
 			return err
@@ -64,7 +65,7 @@ func (r *Reader) ConsumeComment() error {
 // Consume leading whitespace from the reader.
 func (r *Reader) ConsumeLeadingWS() error {
 	for {
-		if !IsWhitespace(r.peek()) {
+		if !IsWhitespace(r.Peek()) {
 			return nil
 		}
 		_, _, err := r.Read()
@@ -76,7 +77,7 @@ func (r *Reader) ConsumeLeadingWS() error {
 
 // consumeColon reads the colon after a key and all whitespace before the value.
 func (r *Reader) consumeColon() error {
-	if IsColon(r.peek()) {
+	if IsColon(r.Peek()) {
 		_, _, err := r.Read()
 		if err != nil {
 			return err
@@ -93,7 +94,7 @@ func (r *Reader) consumeColon() error {
 // consumeToNewline reads all content until a newline rune is encountered.
 func (r *Reader) consumeToNewline() error {
 	for {
-		if IsNewline(r.peek()) {
+		if IsNewline(r.Peek()) {
 			_, _, err := r.Read()
 			if err != nil {
 				return err
