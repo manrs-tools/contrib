@@ -70,8 +70,9 @@ func getReader(fn string) (io.Reader, error) {
 	return fd, nil
 }
 
-// parseFile parses a single file at a time into records sent to the
-// records channel (rc). Files arrive as names on the input channel (ic).
+// parseFile reads and parses files as their filenames arrive on
+// the input channel. A parse error will abort processing for the
+// corresponding file and move to the next one
 func parseFile(ic <-chan string, rc chan<- *rpsl.Record, ec chan<- bool) {
 	for fn := range ic {
 		var rdr *rpsl.Reader
