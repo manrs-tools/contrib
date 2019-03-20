@@ -78,7 +78,7 @@ func parseFile(ic <-chan string, rc chan<- *rpsl.Record, ec chan<- bool) {
 
 		reader, err := getReader(fn)
 		if err != nil {
-			glog.Infof("failed to read file(%v): %v\n", fn, err)
+			glog.Infof("Failed to read file(%v): %v\n", fn, err)
 			continue
 		}
 		rdr = rpsl.NewReader(reader)
@@ -119,7 +119,7 @@ func parseFile(ic <-chan string, rc chan<- *rpsl.Record, ec chan<- bool) {
 // those to the rpsl-parser library, returning each record to a channel for
 // disposition in the final data structure to be loaded into a DB.
 func main() {
-	flag.Var(&rpslFiles, "rpslFiles", "Files to parse, irr/rpsl content(csv).")
+	flag.Var(&rpslFiles, "rpslFiles", "Files to parse, irr/rpsl content, filenames as csv.")
 	flag.Parse()
 
 	// Flag checks.
@@ -151,8 +151,8 @@ func main() {
 	// Track the number of files completed.
 	files := 0
 	// Read records from the channel,
-	// Note: I'm positive this is supposed to be simpler with
-	// a sync.WaitGroup. Investigate that later. (morrowc)
+	// TODO(morrowc): I'm positive this is supposed to be simpler with
+	// a sync.WaitGroup. Investigate that later.
 Loop:
 	for {
 		select {
@@ -171,16 +171,4 @@ Loop:
 	}
 
 	close(rc)
-
-	// Start goroutines which will read filenames to parse and return records
-	// up a channel for further processing.
-	/*
-		for _, rec := range recs {
-			fmt.Printf("Record type(%v):\n", rec.Type)
-			for k, v := range rec.Fields {
-				fmt.Printf("Key(%v)\t-> Val(%v)\n", k, v)
-			}
-			fmt.Println()
-		}
-	*/
 }
