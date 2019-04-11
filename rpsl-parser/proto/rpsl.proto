@@ -1,0 +1,37 @@
+//
+// Proto definition for rpsl-parser and associated rpsl tools.
+
+syntax = "proto3";
+package rpsl.proto;
+
+// Type is the ENUM of various record types that are possible
+// in standard RPSL.
+enum Type {
+  UNKNOWN = 0;
+  ROUTE = 1;
+  ROUTE6 = 2;
+  AUT_NUM = 3;
+  AS_SET = 4;
+  ROUTE_SET = 5;
+  MNTNER = 6;
+  PERSON = 7;
+  INETNUM = 8;
+  KEY_CERT = 9;
+  ROLE = 10;
+  INET_RTR = 11;
+  INET6NUM = 12;
+  FILTER_SET = 13;
+  RTR_SET = 14;
+  PEERING_SET = 15;
+}
+
+message KeyValue {
+  string key = 1;
+  string value = 2;
+}
+//
+// Record, a single rpsl record.
+message Record {
+  Type type = 1;
+  repeated KeyValue keyValue = 2;
+}
