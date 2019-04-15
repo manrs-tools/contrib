@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"testing"
 
+	rppb "./proto"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -90,423 +90,418 @@ func TestFindKey(t *testing.T) {
 	tests := []struct {
 		desc        string
 		input       string
-		wantKey     KeyWord
+		wantKey     rppb.Type
 		wantLiteral string
 	}{{
 		desc:        "Success",
 		input:       "aut-num: 7046\n",
-		wantKey:     AUTNUM,
+		wantKey:     rppb.Type_AUTNUM,
 		wantLiteral: "aut-num",
 	}, {
 		desc:        "Success: address:",
 		input:       "address: asdasdasd",
-		wantKey:     ADDRESS,
+		wantKey:     rppb.Type_ADDRESS,
 		wantLiteral: "address",
 	}, {
 		desc:        "Success: admin-c:",
 		input:       "admin-c: asdasdasd",
-		wantKey:     ADMINC,
+		wantKey:     rppb.Type_ADMINC,
 		wantLiteral: "admin-c",
 	}, {
 		desc:        "Success: aggr-bndry:",
 		input:       "aggr-bndry: asdasdasd",
-		wantKey:     AGGRBNDRY,
+		wantKey:     rppb.Type_AGGRBNDRY,
 		wantLiteral: "aggr-bndry",
 	}, {
 		desc:        "Success: aggr-mtd:",
 		input:       "aggr-mtd: asdasdasd",
-		wantKey:     AGGRMTD,
+		wantKey:     rppb.Type_AGGRMTD,
 		wantLiteral: "aggr-mtd",
 	}, {
 		desc:        "Success: alias:",
 		input:       "alias: agr1-cpt-lo0.wolcomm.net",
-		wantKey:     ALIAS,
+		wantKey:     rppb.Type_ALIAS,
 		wantLiteral: "alias",
 	}, {
 		desc:        "Success: as-name:",
 		input:       "as-name: CRYPt-PW",
-		wantKey:     ASNAME,
+		wantKey:     rppb.Type_ASNAME,
 		wantLiteral: "as-name",
 	}, {
 		desc:        "Success: as-set:",
 		input:       "as-set: CRYPt-PW",
-		wantKey:     ASSET,
+		wantKey:     rppb.Type_ASSET,
 		wantLiteral: "as-set",
 	}, {
 		desc:        "Success: auth:",
 		input:       "auth: CRYPt-PW",
-		wantKey:     AUTH,
+		wantKey:     rppb.Type_AUTH,
 		wantLiteral: "auth",
 	}, {
 		desc:        "Success: certif:",
 		input:       "certif: asdasdasd",
-		wantKey:     CERTIF,
+		wantKey:     rppb.Type_CERTIF,
 		wantLiteral: "certif",
 	}, {
 		desc:        "Success: changed:",
 		input:       "changed: 010018@onsetel.co.kr",
-		wantKey:     CHANGED,
+		wantKey:     rppb.Type_CHANGED,
 		wantLiteral: "changed",
 	}, {
 		desc:        "Success: components:",
 		input:       "components: {104.37.0.0/21^21-24}",
-		wantKey:     COMPONENTS,
+		wantKey:     rppb.Type_COMPONENTS,
 		wantLiteral: "components",
 	}, {
 		desc:        "Success: country:",
 		input:       "country: AE",
-		wantKey:     COUNTRY,
+		wantKey:     rppb.Type_COUNTRY,
 		wantLiteral: "country",
 	}, {
 		desc:        "Success: default:",
 		input:       "default: to",
-		wantKey:     DEFAULT,
+		wantKey:     rppb.Type_DEFAULT,
 		wantLiteral: "default",
 	}, {
 		desc:        "Success: descr:",
 		input:       "descr: asdasdasd",
-		wantKey:     DESCR,
+		wantKey:     rppb.Type_DESCR,
 		wantLiteral: "descr",
 	}, {
 		desc:        "Success: email:",
 		input:       "e-mail: {",
-		wantKey:     EMAIL,
+		wantKey:     rppb.Type_EMAIL,
 		wantLiteral: "e-mail",
 	}, {
 		desc:        "Success: export:",
 		input:       "export: {",
-		wantKey:     EXPORT,
+		wantKey:     rppb.Type_EXPORT,
 		wantLiteral: "export",
 	}, {
 		desc:        "Success: export-comps:",
 		input:       "export-comps: {",
-		wantKey:     EXPORTCOMPS,
+		wantKey:     rppb.Type_EXPORTCOMPS,
 		wantLiteral: "export-comps",
 	}, {
 		desc:        "Success: export-via:",
 		input:       "export-via: {",
-		wantKey:     EXPORTVIA,
+		wantKey:     rppb.Type_EXPORTVIA,
 		wantLiteral: "export-via",
 	}, {
 		desc:        "Success: fax-no:",
 		input:       "fax-no: {",
-		wantKey:     FAXNO,
+		wantKey:     rppb.Type_FAXNO,
 		wantLiteral: "fax-no",
 	}, {
 		desc:        "Success: filter:",
 		input:       "filter: {",
-		wantKey:     FILTER,
+		wantKey:     rppb.Type_FILTER,
 		wantLiteral: "filter",
 	}, {
 		desc:        "Success: filter-set:",
 		input:       "filter-set: {",
-		wantKey:     FILTERSET,
+		wantKey:     rppb.Type_FILTERSET,
 		wantLiteral: "filter-set",
 	}, {
 		desc:        "Success: fingerpr:",
 		input:       "fingerpr: 0045",
-		wantKey:     FINGERPR,
+		wantKey:     rppb.Type_FINGERPR,
 		wantLiteral: "fingerpr",
 	}, {
 		desc:        "Success: geoidx:",
 		input:       "geoidx: -10.806195,-55.459549",
-		wantKey:     GEOIDX,
+		wantKey:     rppb.Type_GEOIDX,
 		wantLiteral: "geoidx",
 	}, {
 		desc:        "Success: holes:",
 		input:       "holes: 135.84.58.0/23",
-		wantKey:     HOLES,
+		wantKey:     rppb.Type_HOLES,
 		wantLiteral: "holes",
 	}, {
 		desc:        "Success: ifaddr:",
 		input:       "ifaddr: 146.129.242.213",
-		wantKey:     IFADDR,
+		wantKey:     rppb.Type_IFADDR,
 		wantLiteral: "ifaddr",
 	}, {
 		desc:        "Success: import:",
 		input:       "import: {",
-		wantKey:     IMPORT,
+		wantKey:     rppb.Type_IMPORT,
 		wantLiteral: "import",
 	}, {
 		desc:        "Success: import-via:",
 		input:       "import-via: {",
-		wantKey:     IMPORTVIA,
+		wantKey:     rppb.Type_IMPORTVIA,
 		wantLiteral: "import-via",
 	}, {
 		desc:        "Success: inetnum:",
 		input:       "inetnum: 104.132.0.0",
-		wantKey:     INETNUM,
+		wantKey:     rppb.Type_INETNUM,
 		wantLiteral: "inetnum",
 	}, {
 		desc:        "Success: inet6num:",
 		input:       "inet6num: 2001:db8::/32",
-		wantKey:     INET6NUM,
+		wantKey:     rppb.Type_INET6NUM,
 		wantLiteral: "inet6num",
 	}, {
 		desc:        "Success: inet-rtr:",
 		input:       "inet-rtr: 2001:db8::/32",
-		wantKey:     INETRTR,
+		wantKey:     rppb.Type_INETRTR,
 		wantLiteral: "inet-rtr",
 	}, {
 		desc:        "Success: interface:",
 		input:       "interface: 2001:1900:2100::3ce2",
-		wantKey:     INTERFACE,
+		wantKey:     rppb.Type_INTERFACE,
 		wantLiteral: "interface",
 	}, {
 		desc:        "Success key-cert:",
 		input:       "key-cert: asdsad",
-		wantKey:     KEYCERT,
+		wantKey:     rppb.Type_KEYCERT,
 		wantLiteral: "key-cert",
 	}, {
 		desc:        "Success local-as:",
 		input:       "local-as: asdsad",
-		wantKey:     LOCALAS,
+		wantKey:     rppb.Type_LOCALAS,
 		wantLiteral: "local-as",
 	}, {
 		desc:        "Success: mbrs-by-ref:",
 		input:       "mbrs-by-ref: asdasdasd",
-		wantKey:     MBRSBYREF,
+		wantKey:     rppb.Type_MBRSBYREF,
 		wantLiteral: "mbrs-by-ref",
 	}, {
 		desc:        "Success: member-of:",
 		input:       "member-of: asdasdasd",
-		wantKey:     MEMBEROF,
+		wantKey:     rppb.Type_MEMBEROF,
 		wantLiteral: "member-of",
 	}, {
 		desc:        "Success: members:",
 		input:       "members: asdasdasd",
-		wantKey:     MEMBERS,
+		wantKey:     rppb.Type_MEMBERS,
 		wantLiteral: "members",
 	}, {
 		desc:        "Success: method:",
 		input:       "method: PGP",
-		wantKey:     METHOD,
+		wantKey:     rppb.Type_METHOD,
 		wantLiteral: "method",
 	}, {
 		desc:        "Success: mnt-by:",
 		input:       "mnt-by: AS71-MNT",
-		wantKey:     MNTBY,
+		wantKey:     rppb.Type_MNTBY,
 		wantLiteral: "mnt-by",
 	}, {
 		desc:        "Success: mnt-notify:",
 		input:       "mnt-nfy: AS71-MNT",
-		wantKey:     MNTNFY,
+		wantKey:     rppb.Type_MNTNFY,
 		wantLiteral: "mnt-nfy",
 	}, {
 		desc:        "Success: mntner:",
 		input:       "mntner: AS71-MNT",
-		wantKey:     MNTNER,
+		wantKey:     rppb.Type_MNTNER,
 		wantLiteral: "mntner",
 	}, {
 		desc:        "Success: mp-export:",
 		input:       "mp-export: AS71-MNT",
-		wantKey:     MPEXPORT,
+		wantKey:     rppb.Type_MPEXPORT,
 		wantLiteral: "mp-export",
 	}, {
 		desc:        "Success: mp-filter:",
 		input:       "mp-filter: AS71-MNT",
-		wantKey:     MPFILTER,
+		wantKey:     rppb.Type_MPFILTER,
 		wantLiteral: "mp-filter",
 	}, {
 		desc:        "Success: mp-import:",
 		input:       "mp-import: AS71-MNT",
-		wantKey:     MPIMPORT,
+		wantKey:     rppb.Type_MPIMPORT,
 		wantLiteral: "mp-import",
 	}, {
 		desc:        "Success: mp-members:",
 		input:       "mp-members: AS71-MNT",
-		wantKey:     MPMEMBERS,
+		wantKey:     rppb.Type_MPMEMBERS,
 		wantLiteral: "mp-members",
 	}, {
 		desc:        "Success: mp-peer:",
 		input:       "mp-peer: AS71-MNT",
-		wantKey:     MPPEER,
+		wantKey:     rppb.Type_MPPEER,
 		wantLiteral: "mp-peer",
 	}, {
 		desc:        "Success: mp-peering:",
 		input:       "mp-peering: AS71-MNT",
-		wantKey:     MPPEERING,
+		wantKey:     rppb.Type_MPPEERING,
 		wantLiteral: "mp-peering",
 	}, {
 		desc:        "Success: netname:",
 		input:       "netname: GOOGLE-CORP-AARHUS",
-		wantKey:     NETNAME,
+		wantKey:     rppb.Type_NETNAME,
 		wantLiteral: "netname",
 	}, {
 		desc:        "Success: nic-hdl:",
 		input:       "nic-hdl: GOOGLE-CORP-AARHUS",
-		wantKey:     NICHDL,
+		wantKey:     rppb.Type_NICHDL,
 		wantLiteral: "nic-hdl",
 	}, {
 		desc:        "Success: notify:",
 		input:       "notify: Aaron.hanson@kent.k12.wa.us",
-		wantKey:     NOTIFY,
+		wantKey:     rppb.Type_NOTIFY,
 		wantLiteral: "notify",
 	}, {
 		desc:        "Success: origin:",
 		input:       "origin: AS1",
-		wantKey:     ORIGIN,
+		wantKey:     rppb.Type_ORIGIN,
 		wantLiteral: "origin",
 	}, {
 		desc:        "Success: owner:",
 		input:       "owner: Aaron",
-		wantKey:     OWNER,
+		wantKey:     rppb.Type_OWNER,
 		wantLiteral: "owner",
 	}, {
 		desc:        "Success: peer:",
 		input:       "peer: BGP4",
-		wantKey:     PEER,
+		wantKey:     rppb.Type_PEER,
 		wantLiteral: "peer",
 	}, {
 		desc:        "Success: peering:",
 		input:       "peering: AS10310",
-		wantKey:     PEERING,
+		wantKey:     rppb.Type_PEERING,
 		wantLiteral: "peering",
 	}, {
 		desc:        "Success: peering-set:",
 		input:       "peering-set: AS10310",
-		wantKey:     PEERINGSET,
+		wantKey:     rppb.Type_PEERINGSET,
 		wantLiteral: "peering-set",
 	}, {
 		desc:        "Success: person:",
 		input:       "person: Aaron",
-		wantKey:     PERSON,
+		wantKey:     rppb.Type_PERSON,
 		wantLiteral: "person",
 	}, {
 		desc:        "Success: phone:",
 		input:       "phone: 0040310800700",
-		wantKey:     PHONE,
+		wantKey:     rppb.Type_PHONE,
 		wantLiteral: "phone",
 	}, {
 		desc:        "Success: remarks:",
 		input:       "remarks: asdadasd",
-		wantKey:     REMARKS,
+		wantKey:     rppb.Type_REMARKS,
 		wantLiteral: "remarks",
 	}, {
 		desc:        "Success: role:",
 		input:       "role: AAPT",
-		wantKey:     ROLE,
+		wantKey:     rppb.Type_ROLE,
 		wantLiteral: "role",
 	}, {
 		desc:        "Success: roa-uri:",
 		input:       "roa-uri: AAPT",
-		wantKey:     ROAURI,
+		wantKey:     rppb.Type_ROAURI,
 		wantLiteral: "roa-uri",
 	}, {
 		desc:        "Success: route:",
 		input:       "route: 1.0.0.0/24",
-		wantKey:     ROUTE,
+		wantKey:     rppb.Type_ROUTE,
 		wantLiteral: "route",
 	}, {
 		desc:        "Success: route6:",
 		input:       "route6: 2001:db8::/32",
-		wantKey:     ROUTE6,
+		wantKey:     rppb.Type_ROUTE6,
 		wantLiteral: "route6",
 	}, {
 		desc:        "Success: route-set:",
 		input:       "route-set: 1.0.0.0/24",
-		wantKey:     ROUTESET,
+		wantKey:     rppb.Type_ROUTESET,
 		wantLiteral: "route-set",
 	}, {
 		desc:        "Success: rs-in:",
 		input:       "rs-in: 1.0.0.0/24",
-		wantKey:     RSIN,
+		wantKey:     rppb.Type_RSIN,
 		wantLiteral: "rs-in",
 	}, {
 		desc:        "Success: rs-out:",
 		input:       "rs-out: 1.0.0.0/24",
-		wantKey:     RSOUT,
+		wantKey:     rppb.Type_RSOUT,
 		wantLiteral: "rs-out",
 	}, {
 		desc:        "Success: rtr-set:",
 		input:       "rtr-set: 1.0.0.0/24",
-		wantKey:     RTRSET,
+		wantKey:     rppb.Type_RTRSET,
 		wantLiteral: "rtr-set",
 	}, {
 		desc:        "Success: route-set:",
 		input:       "route-set: 1.0.0.0/24",
-		wantKey:     ROUTESET,
+		wantKey:     rppb.Type_ROUTESET,
 		wantLiteral: "route-set",
 	}, {
 		desc:        "Success: source:",
 		input:       "source: radb",
-		wantKey:     SOURCE,
+		wantKey:     rppb.Type_SOURCE,
 		wantLiteral: "source",
 	}, {
 		desc:        "Success: status:",
 		input:       "status: ASSIGNED",
-		wantKey:     STATUS,
+		wantKey:     rppb.Type_STATUS,
 		wantLiteral: "status",
 	}, {
 		desc:        "Success: tech-c:",
 		input:       "tech-c: abuse@adnc.com",
-		wantKey:     TECHC,
+		wantKey:     rppb.Type_TECHC,
 		wantLiteral: "tech-c",
 	}, {
 		desc:        "Success: trouble:",
 		input:       "trouble: abuse@adnc.com",
-		wantKey:     TROUBLE,
+		wantKey:     rppb.Type_TROUBLE,
 		wantLiteral: "trouble",
 	}, {
 		desc:        "Success: upd-to:",
 		input:       "upd-to: abuse@adnc.com",
-		wantKey:     UPDTO,
+		wantKey:     rppb.Type_UPDTO,
 		wantLiteral: "upd-to",
 	}, {
 		desc:        "Success: *xxe:",
 		input:       "*xxe: abuse@adnc.com",
-		wantKey:     XXE,
+		wantKey:     rppb.Type_XXE,
 		wantLiteral: "*xxe",
 	}, {
 		desc:        "Success: *xxner:",
 		input:       "*xxner: abuse@adnc.com",
-		wantKey:     XXNER,
+		wantKey:     rppb.Type_XXNER,
 		wantLiteral: "*xxner",
 	}, {
 		desc:        "Success: *xx-num:",
 		input:       "*xx-num: abuse@adnc.com",
-		wantKey:     XXNUM,
+		wantKey:     rppb.Type_XXNUM,
 		wantLiteral: "*xx-num",
 	}, {
 		desc:        "Success: *xxring-set:",
 		input:       "*xxring-set: abuse@adnc.com",
-		wantKey:     XXRINGSET,
+		wantKey:     rppb.Type_XXRINGSET,
 		wantLiteral: "*xxring-set",
 	}, {
 		desc:        "Success: *xxset:",
 		input:       "*xxset: abuse@adnc.com",
-		wantKey:     XXSET,
+		wantKey:     rppb.Type_XXSET,
 		wantLiteral: "*xxset",
 	}, {
 		desc:        "Success: *xxson:",
 		input:       "*xxson: abuse@adnc.com",
-		wantKey:     XXSON,
+		wantKey:     rppb.Type_XXSON,
 		wantLiteral: "*xxson",
 	}, {
 		desc:        "Success: *xxte:",
 		input:       "*xxte: abuse@adnc.com",
-		wantKey:     XXTE,
+		wantKey:     rppb.Type_XXTE,
 		wantLiteral: "*xxte",
 	}, {
 		desc:        "Success: *xxte6:",
 		input:       "*xxte6: abuse@adnc.com",
-		wantKey:     XXTE6,
+		wantKey:     rppb.Type_XXTE6,
 		wantLiteral: "*xxte6",
 	}, {
 		desc:        "Success: *xxte-set:",
 		input:       "*xxte-set: abuse@adnc.com",
-		wantKey:     XXTESET,
+		wantKey:     rppb.Type_XXTESET,
 		wantLiteral: "*xxte-set",
 	}, {
-		desc:        "Success ILLEGAL",
+		desc:        "Success UNKNOWN",
 		input:       "aut: 7046\nas-name: UUNET Customer ASN\n\n",
-		wantKey:     ILLEGAL,
+		wantKey:     rppb.Type_UNKNOWN,
 		wantLiteral: "aut",
-	}, {
-		desc:        "Success EOF in key",
-		input:       "aut",
-		wantKey:     EOF,
-		wantLiteral: "",
 	}}
 
 	for _, test := range tests {
@@ -595,12 +590,19 @@ func TestInitRecord(t *testing.T) {
 	tests := []struct {
 		desc    string
 		input   string
-		want    Record
+		want    rppb.Record
 		wantErr bool
 	}{{
 		desc:  "Successful initialization",
 		input: "aut-num: 7046\nas-name: uunet customer\n\n",
-		want:  Record{Type: AUTNUM, Fields: map[KeyWord]string{AUTNUM: "7046"}},
+		want: rppb.Record{
+			Type: rppb.Type_AUTNUM,
+			Fields: []*rppb.KeyValue{
+				&rppb.KeyValue{
+					Key:   rppb.Type_AUTNUM,
+					Value: "7046",
+				},
+			}},
 	}, {
 		desc:    "Fail IllegalKey",
 		input:   "foo: bar\nbaz: bling\n",
@@ -628,8 +630,8 @@ func TestInitRecord(t *testing.T) {
 		case err == nil && test.wantErr:
 			t.Errorf("[%v]: did not get error, expected one.", test.desc)
 		case err == nil:
-			if !reflect.DeepEqual(*got, test.want) {
-				t.Errorf("[%v]: got(%+v) does not equal want(%+v)", test.desc, *got, test.want)
+			if !cmp.Equal(*got, test.want) {
+				t.Errorf("[%v]: got / want diff: \n%v", test.desc, cmp.Diff(*got, test.want))
 			}
 		}
 	}
@@ -671,69 +673,81 @@ func TestParse(t *testing.T) {
 	tests := []struct {
 		desc    string
 		file    string
-		want    *Record
+		want    rppb.Record
 		rec     int
 		recs    int
 		wantErr bool
 	}{{
 		desc: "Success with single values only",
 		file: "aut-num.txt",
-		want: &Record{Type: AUTNUM, Fields: map[KeyWord]string{
-			AUTNUM:  "AS372",
-			ASNAME:  "UNSPECIFIED",
-			DESCR:   "Nasa Science Network (FIX-West)",
-			ADMINC:  "Not available",
-			TECHC:   "See MAINT-AS372",
-			MNTBY:   "MAINT-AS372",
-			CHANGED: "DB-admin@merit.edu 19950201",
-			SOURCE:  "RADB",
-		}},
+		want: rppb.Record{
+			Type: rppb.Type_AUTNUM,
+			Fields: []*rppb.KeyValue{
+				&rppb.KeyValue{Key: rppb.Type_AUTNUM, Value: "AS372"},
+				&rppb.KeyValue{Key: rppb.Type_ASNAME, Value: "UNSPECIFIED"},
+				&rppb.KeyValue{Key: rppb.Type_DESCR, Value: "Nasa Science Network (FIX-West)"},
+				&rppb.KeyValue{Key: rppb.Type_ADMINC, Value: "Not available"},
+				&rppb.KeyValue{Key: rppb.Type_TECHC, Value: "See MAINT-AS372"},
+				&rppb.KeyValue{Key: rppb.Type_MNTBY, Value: "MAINT-AS372"},
+				&rppb.KeyValue{Key: rppb.Type_CHANGED, Value: "DB-admin@merit.edu 19950201"},
+				&rppb.KeyValue{Key: rppb.Type_SOURCE, Value: "RADB"},
+			}},
 		rec:  0,
 		recs: 1,
 	}, {
 		desc: "Success - with double value (members)",
 		file: "as-set.txt",
-		want: &Record{Type: ASSET, Fields: map[KeyWord]string{
-			ASSET:   "AS-CENTRILOGIC-UK:AS-CUSTOMERS",
-			DESCR:   "CentriLogic (UK Network) Customer ASNs",
-			MEMBERS: "AS204018 AS33459",
-			ADMINC:  "CentriLogic IP Tech",
-			MNTBY:   "MAINT-AS19693",
-			CHANGED: "IPtech@centrilogic.com 20180614  #14:42:22Z",
-			TECHC:   "CentriLogic IP Tech",
-			NOTIFY:  "iptech@centrilogic.com",
-			SOURCE:  "RADB",
-		}},
+		want: rppb.Record{
+			Type: rppb.Type_ASSET,
+			Fields: []*rppb.KeyValue{
+				&rppb.KeyValue{Key: rppb.Type_ASSET, Value: "AS-CENTRILOGIC-UK:AS-CUSTOMERS"},
+				&rppb.KeyValue{Key: rppb.Type_DESCR, Value: "CentriLogic (UK Network) Customer ASNs"},
+				&rppb.KeyValue{Key: rppb.Type_MEMBERS, Value: "AS204018"},
+				&rppb.KeyValue{Key: rppb.Type_MEMBERS, Value: "AS33459"},
+				&rppb.KeyValue{Key: rppb.Type_ADMINC, Value: "CentriLogic IP Tech"},
+				&rppb.KeyValue{Key: rppb.Type_TECHC, Value: "CentriLogic IP Tech"},
+				&rppb.KeyValue{Key: rppb.Type_NOTIFY, Value: "iptech@centrilogic.com"},
+				&rppb.KeyValue{Key: rppb.Type_MNTBY, Value: "MAINT-AS19693"},
+				&rppb.KeyValue{
+					Key:   rppb.Type_CHANGED,
+					Value: "IPtech@centrilogic.com 20180614  #14:42:22Z",
+				},
+				&rppb.KeyValue{Key: rppb.Type_SOURCE, Value: "RADB"},
+			}},
 		rec:  0,
 		recs: 1,
 	}, {
 		desc: "Success with two records read",
 		file: "two-records.txt",
-		want: &Record{Type: AUTNUM, Fields: map[KeyWord]string{
-			AUTNUM:  "AS1263",
-			ASNAME:  "NSN-TEST-AS",
-			DESCR:   "NSN-TEST-AS",
-			ADMINC:  "Not available",
-			TECHC:   "See MAINT-AS1263",
-			MNTBY:   "MAINT-AS1263",
-			CHANGED: "DB-admin@merit.edu 19950201",
-			SOURCE:  "RADB",
-		}},
+		want: rppb.Record{
+			Type: rppb.Type_AUTNUM,
+			Fields: []*rppb.KeyValue{
+				&rppb.KeyValue{Key: rppb.Type_AUTNUM, Value: "AS1263"},
+				&rppb.KeyValue{Key: rppb.Type_ASNAME, Value: "NSN-TEST-AS"},
+				&rppb.KeyValue{Key: rppb.Type_DESCR, Value: "NSN-TEST-AS"},
+				&rppb.KeyValue{Key: rppb.Type_ADMINC, Value: "Not available"},
+				&rppb.KeyValue{Key: rppb.Type_TECHC, Value: "See MAINT-AS1263"},
+				&rppb.KeyValue{Key: rppb.Type_MNTBY, Value: "MAINT-AS1263"},
+				&rppb.KeyValue{Key: rppb.Type_CHANGED, Value: "DB-admin@merit.edu 19950201"},
+				&rppb.KeyValue{Key: rppb.Type_SOURCE, Value: "RADB"},
+			}},
 		rec:  1,
 		recs: 2,
 	}, {
 		desc: "Success with a plus-sign continuation character",
 		file: "route-set.txt",
-		want: &Record{Type: ROUTESET, Fields: map[KeyWord]string{
-			ROUTESET:  "RS-CTB-NOVA",
-			MEMBERS:   "138.0.96.0/22,\n            143.0.128.0/22,\n            167.249.164.0/22,\n            168.195.104.0/22,\n            192.141.100.0/22,\n+\n            192.141.100.0/24",
-			MPMEMBERS: "2804:2138::/32,\n            2804:2c04::/32,\n            2804:42bc::/32",
-			DESCR:     "CTB's customer",
-			REMARKS:   "ASN 264543",
-			MNTBY:     "MAINT-AS36678",
-			CHANGED:   "jiangz@ctamericas.com 20180614  #21:22:22Z",
-			SOURCE:    "RADB",
-		}},
+		want: rppb.Record{
+			Type: rppb.Type_ROUTESET,
+			Fields: []*rppb.KeyValue{
+				&rppb.KeyValue{Key: rppb.Type_ROUTESET, Value: "RS-CTB-NOVA"},
+				&rppb.KeyValue{Key: rppb.Type_MEMBERS, Value: "138.0.96.0/22,\n            143.0.128.0/22,\n            167.249.164.0/22,\n            168.195.104.0/22,\n            192.141.100.0/22,\n+\n            192.141.100.0/24"},
+				&rppb.KeyValue{Key: rppb.Type_MPMEMBERS, Value: "2804:2138::/32,\n            2804:2c04::/32,\n            2804:42bc::/32"},
+				&rppb.KeyValue{Key: rppb.Type_DESCR, Value: "CTB's customer"},
+				&rppb.KeyValue{Key: rppb.Type_REMARKS, Value: "ASN 264543"},
+				&rppb.KeyValue{Key: rppb.Type_MNTBY, Value: "MAINT-AS36678"},
+				&rppb.KeyValue{Key: rppb.Type_CHANGED, Value: "jiangz@ctamericas.com 20180614  #21:22:22Z"},
+				&rppb.KeyValue{Key: rppb.Type_SOURCE, Value: "RADB"},
+			}},
 		rec:  0,
 		recs: 1,
 	}}
@@ -748,7 +762,7 @@ func TestParse(t *testing.T) {
 		}
 
 		r := NewReader(fd)
-		rc := make(chan *Record, 10)
+		rc := make(chan *rppb.Record, 10)
 
 		// Run the parse routine, pull the Records off the channel.
 		Parse(r, rc)
@@ -758,7 +772,7 @@ func TestParse(t *testing.T) {
 			err = nil
 		}
 
-		var got []*Record
+		var got []*rppb.Record
 		if err == nil {
 			for i := 0; i < test.recs; i++ {
 				got = append(got, <-rc)
@@ -771,8 +785,8 @@ func TestParse(t *testing.T) {
 		case err == nil && test.wantErr:
 			t.Errorf("[%v]: did not get error, expected one.", test.desc)
 		case err == nil:
-			if !cmp.Equal(got[test.rec], test.want) {
-				t.Errorf("[%v]: got/want mismatch:\n%s", test.desc, cmp.Diff(got[test.rec], test.want))
+			if !cmp.Equal(*got[test.rec], test.want) {
+				t.Errorf("[%v]: got/want mismatch:\n%s", test.desc, cmp.Diff(*got[test.rec], test.want))
 			}
 		}
 	}

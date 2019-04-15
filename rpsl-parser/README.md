@@ -4,13 +4,16 @@
 
 A library to parse IRR database data.
 
-Reads an IRR/RPSL file, parsing each record into a returned slice of structs.
+Reads an IRR/RPSL file, parsing each record into a Google Protobuf,
+the protobuf is defined in rpsl-parser/proto/.
 
 Example usage of this library is in:
 exanples/...
 
 the example parses the contents of the file: /tmp/radb.db
 and outputs records when run:
+TODO(morrowc): Add a more relevant example,
+and fix the example main.go to be more relevant.
 
 ~~~~
 Record type(63):

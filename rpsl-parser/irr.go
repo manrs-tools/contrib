@@ -24,6 +24,8 @@ import (
 	"io"
 	"strings"
 
+	rppb "./proto"
+
 	glog "github.com/golang/glog"
 )
 
@@ -31,23 +33,6 @@ import (
 type Reader struct {
 	reader *bufio.Reader
 }
-
-// Record is a single IRR record.
-type Record struct {
-	Type   KeyWord
-	Fields map[KeyWord]string // Fields is the whole record indexed by key.
-}
-
-func (r *Record) String() string {
-	var res []string
-	res = append(res, fmt.Sprintf("Type:\t%v", r.Type))
-	for k, v := range r.Fields {
-		res = append(res, fmt.Sprintf("%v:\t%v", k, v))
-	}
-	return strings.Join(res, "\n")
-}
-
-type Records []*Record
 
 // NewReader instantiates a new reader object.
 func NewReader(fd io.Reader) *Reader {
@@ -65,190 +50,188 @@ func (r *Reader) Unread() error {
 }
 
 // findKey scans forward until a colon is discovered, returning the keyword found.
-func (r *Reader) findKey() (KeyWord, string) {
+func (r *Reader) findKey() (rppb.Type, string) {
 	var buf bytes.Buffer
 	for {
 		// ReadRule until a colon is found, return the buf and
 		// switch over the type of keyword.
 		ch, _, err := r.Read()
 		if err != nil {
-			return EOF, ""
+			return rppb.Type_UNKNOWN, ""
 		}
 
 		if IsColon(ch) {
 			err := r.Unread()
 			if err != nil {
 				fmt.Printf("failed to unread(%v) on reader.\n", string(ch))
-				return ILLEGAL, buf.String()
+				return rppb.Type_UNKNOWN, buf.String()
 			}
 
 			switch strings.ToUpper(buf.String()) {
-			case "ADDRESS":
-				return ADDRESS, buf.String()
-			case "ADMIN-C":
-				return ADMINC, buf.String()
-			case "AGGR-BNDRY":
-				return AGGRBNDRY, buf.String()
-			case "AGGR-MTD":
-				return AGGRMTD, buf.String()
-			case "ALIAS":
-				return ALIAS, buf.String()
-			case "AS-NAME":
-				return ASNAME, buf.String()
-			case "AS-SET":
-				return ASSET, buf.String()
-			case "AUTH":
-				return AUTH, buf.String()
-			case "AUT-NUM":
-				return AUTNUM, buf.String()
-			case "CERTIF":
-				return CERTIF, buf.String()
-			case "CHANGED":
-				return CHANGED, buf.String()
-			case "COMPONENTS":
-				return COMPONENTS, buf.String()
-			case "COUNTRY":
-				return COUNTRY, buf.String()
-			case "DEFAULT":
-				return DEFAULT, buf.String()
-			case "DESCR":
-				return DESCR, buf.String()
-			case "E-MAIL":
-				return EMAIL, buf.String()
-			case "EOF":
-				return EOF, buf.String()
-			case "EXPORT":
-				return EXPORT, buf.String()
-			case "EXPORT-COMPS":
-				return EXPORTCOMPS, buf.String()
-			case "EXPORT-VIA":
-				return EXPORTVIA, buf.String()
-			case "FAX-NO":
-				return FAXNO, buf.String()
-			case "FILTER":
-				return FILTER, buf.String()
-			case "FILTER-SET":
-				return FILTERSET, buf.String()
-			case "FINGERPR":
-				return FINGERPR, buf.String()
-			case "GEOIDX":
-				return GEOIDX, buf.String()
-			case "HOLES":
-				return HOLES, buf.String()
-			case "IFADDR":
-				return IFADDR, buf.String()
-			case "IMPORT":
-				return IMPORT, buf.String()
-			case "IMPORT-VIA":
-				return IMPORTVIA, buf.String()
-			case "INET6NUM":
-				return INET6NUM, buf.String()
-			case "INETNUM":
-				return INETNUM, buf.String()
-			case "INET-RTR":
-				return INETRTR, buf.String()
-			case "INTERFACE":
-				return INTERFACE, buf.String()
-			case "KEY-CERT":
-				return KEYCERT, buf.String()
-			case "LOCAL-AS":
-				return LOCALAS, buf.String()
-			case "MBRS-BY-REF":
-				return MBRSBYREF, buf.String()
-			case "MEMBER-OF":
-				return MEMBEROF, buf.String()
-			case "MEMBERS":
-				return MEMBERS, buf.String()
-			case "METHOD":
-				return METHOD, buf.String()
-			case "MNT-BY":
-				return MNTBY, buf.String()
-			case "MNTNER":
-				return MNTNER, buf.String()
-			case "MNT-NFY":
-				return MNTNFY, buf.String()
-			case "MP-EXPORT":
-				return MPEXPORT, buf.String()
-			case "MP-FILTER":
-				return MPFILTER, buf.String()
-			case "MP-IMPORT":
-				return MPIMPORT, buf.String()
-			case "MP-MEMBERS":
-				return MPMEMBERS, buf.String()
-			case "MP-PEER":
-				return MPPEER, buf.String()
-			case "MP-PEERING":
-				return MPPEERING, buf.String()
-			case "NETNAME":
-				return NETNAME, buf.String()
-			case "NIC-HDL":
-				return NICHDL, buf.String()
-			case "NOTIFY":
-				return NOTIFY, buf.String()
-			case "ORIGIN":
-				return ORIGIN, buf.String()
-			case "OWNER":
-				return OWNER, buf.String()
-			case "PEER":
-				return PEER, buf.String()
-			case "PEERING":
-				return PEERING, buf.String()
-			case "PEERING-SET":
-				return PEERINGSET, buf.String()
-			case "PERSON":
-				return PERSON, buf.String()
-			case "PHONE":
-				return PHONE, buf.String()
-			case "REMARKS":
-				return REMARKS, buf.String()
-			case "ROA-URI":
-				return ROAURI, buf.String()
-			case "ROLE":
-				return ROLE, buf.String()
 			case "ROUTE":
-				return ROUTE, buf.String()
+				return rppb.Type_ROUTE, buf.String()
 			case "ROUTE6":
-				return ROUTE6, buf.String()
+				return rppb.Type_ROUTE6, buf.String()
+			case "AUT-NUM":
+				return rppb.Type_AUTNUM, buf.String()
+			case "AS-SET":
+				return rppb.Type_ASSET, buf.String()
 			case "ROUTE-SET":
-				return ROUTESET, buf.String()
-			case "RS-IN":
-				return RSIN, buf.String()
-			case "RS-OUT":
-				return RSOUT, buf.String()
+				return rppb.Type_ROUTESET, buf.String()
+			case "MNTNER":
+				return rppb.Type_MNTNER, buf.String()
+			case "PERSON":
+				return rppb.Type_PERSON, buf.String()
+			case "INETNUM":
+				return rppb.Type_INETNUM, buf.String()
+			case "KEY-CERT":
+				return rppb.Type_KEYCERT, buf.String()
+			case "ROLE":
+				return rppb.Type_ROLE, buf.String()
+			case "INET-RTR":
+				return rppb.Type_INETRTR, buf.String()
+			case "INET6NUM":
+				return rppb.Type_INET6NUM, buf.String()
+			case "FILTER-SET":
+				return rppb.Type_FILTERSET, buf.String()
 			case "RTR-SET":
-				return RTRSET, buf.String()
+				return rppb.Type_RTRSET, buf.String()
+			case "PEERING-SET":
+				return rppb.Type_PEERINGSET, buf.String()
+			case "ADDRESS":
+				return rppb.Type_ADDRESS, buf.String()
+			case "ADMIN-C":
+				return rppb.Type_ADMINC, buf.String()
+			case "AGGR-BNDRY":
+				return rppb.Type_AGGRBNDRY, buf.String()
+			case "AGGR-MTD":
+				return rppb.Type_AGGRMTD, buf.String()
+			case "ALIAS":
+				return rppb.Type_ALIAS, buf.String()
+			case "AS-NAME":
+				return rppb.Type_ASNAME, buf.String()
+			case "AUTH":
+				return rppb.Type_AUTH, buf.String()
+			case "CERTIF":
+				return rppb.Type_CERTIF, buf.String()
+			case "CHANGED":
+				return rppb.Type_CHANGED, buf.String()
+			case "COMPONENTS":
+				return rppb.Type_COMPONENTS, buf.String()
+			case "COUNTRY":
+				return rppb.Type_COUNTRY, buf.String()
+			case "DEFAULT":
+				return rppb.Type_DEFAULT, buf.String()
+			case "DESCR":
+				return rppb.Type_DESCR, buf.String()
+			case "E-MAIL":
+				return rppb.Type_EMAIL, buf.String()
+			case "EXPORT":
+				return rppb.Type_EXPORT, buf.String()
+			case "EXPORT-COMPS":
+				return rppb.Type_EXPORTCOMPS, buf.String()
+			case "EXPORT-VIA":
+				return rppb.Type_EXPORTVIA, buf.String()
+			case "FAX-NO":
+				return rppb.Type_FAXNO, buf.String()
+			case "FILTER":
+				return rppb.Type_FILTER, buf.String()
+			case "FINGERPR":
+				return rppb.Type_FINGERPR, buf.String()
+			case "GEOIDX":
+				return rppb.Type_GEOIDX, buf.String()
+			case "HOLES":
+				return rppb.Type_HOLES, buf.String()
+			case "IFADDR":
+				return rppb.Type_IFADDR, buf.String()
+			case "IMPORT":
+				return rppb.Type_IMPORT, buf.String()
+			case "IMPORT-VIA":
+				return rppb.Type_IMPORTVIA, buf.String()
+			case "INTERFACE":
+				return rppb.Type_INTERFACE, buf.String()
+			case "LOCAL-AS":
+				return rppb.Type_LOCALAS, buf.String()
+			case "MBRS-BY-REF":
+				return rppb.Type_MBRSBYREF, buf.String()
+			case "MEMBER-OF":
+				return rppb.Type_MEMBEROF, buf.String()
+			case "MEMBERS":
+				return rppb.Type_MEMBERS, buf.String()
+			case "METHOD":
+				return rppb.Type_METHOD, buf.String()
+			case "MNT-BY":
+				return rppb.Type_MNTBY, buf.String()
+			case "MNT-NFY":
+				return rppb.Type_MNTNFY, buf.String()
+			case "MP-EXPORT":
+				return rppb.Type_MPEXPORT, buf.String()
+			case "MP-FILTER":
+				return rppb.Type_MPFILTER, buf.String()
+			case "MP-IMPORT":
+				return rppb.Type_MPIMPORT, buf.String()
+			case "MP-MEMBERS":
+				return rppb.Type_MPMEMBERS, buf.String()
+			case "MP-PEER":
+				return rppb.Type_MPPEER, buf.String()
+			case "MP-PEERING":
+				return rppb.Type_MPPEERING, buf.String()
+			case "NETNAME":
+				return rppb.Type_NETNAME, buf.String()
+			case "NIC-HDL":
+				return rppb.Type_NICHDL, buf.String()
+			case "NOTIFY":
+				return rppb.Type_NOTIFY, buf.String()
+			case "ORIGIN":
+				return rppb.Type_ORIGIN, buf.String()
+			case "OWNER":
+				return rppb.Type_OWNER, buf.String()
+			case "PEER":
+				return rppb.Type_PEER, buf.String()
+			case "PEERING":
+				return rppb.Type_PEERING, buf.String()
+			case "PHONE":
+				return rppb.Type_PHONE, buf.String()
+			case "REMARKS":
+				return rppb.Type_REMARKS, buf.String()
+			case "ROA-URI":
+				return rppb.Type_ROAURI, buf.String()
+			case "RS-IN":
+				return rppb.Type_RSIN, buf.String()
+			case "RS-OUT":
+				return rppb.Type_RSOUT, buf.String()
 			case "SOURCE":
-				return SOURCE, buf.String()
+				return rppb.Type_SOURCE, buf.String()
 			case "STATUS":
-				return STATUS, buf.String()
+				return rppb.Type_STATUS, buf.String()
 			case "TECH-C":
-				return TECHC, buf.String()
+				return rppb.Type_TECHC, buf.String()
 			case "TROUBLE":
-				return TROUBLE, buf.String()
+				return rppb.Type_TROUBLE, buf.String()
 			case "UPD-TO":
-				return UPDTO, buf.String()
+				return rppb.Type_UPDTO, buf.String()
 			case "*XXE":
-				return XXE, buf.String()
+				return rppb.Type_XXE, buf.String()
 			case "*XXNER":
-				return XXNER, buf.String()
+				return rppb.Type_XXNER, buf.String()
 			case "*XX-NUM":
-				return XXNUM, buf.String()
+				return rppb.Type_XXNUM, buf.String()
 			case "*XXRING-SET":
-				return XXRINGSET, buf.String()
+				return rppb.Type_XXRINGSET, buf.String()
 			case "*XXSET":
-				return XXSET, buf.String()
+				return rppb.Type_XXSET, buf.String()
 			case "*XXSON":
-				return XXSON, buf.String()
+				return rppb.Type_XXSON, buf.String()
 			case "*XXTE":
-				return XXTE, buf.String()
+				return rppb.Type_XXTE, buf.String()
 			case "*XXTE6":
-				return XXTE6, buf.String()
+				return rppb.Type_XXTE6, buf.String()
 			case "*XXTE-SET":
-				return XXTESET, buf.String()
+				return rppb.Type_XXTESET, buf.String()
 			default:
 				// TODO(morrowc): Log this output instead of printing it to the console.
 				// fmt.Printf("failed to match whatever is in buf currently: %v\n", buf.String())
-				return ILLEGAL, buf.String()
+				return rppb.Type_UNKNOWN, buf.String()
 			}
 
 		}
@@ -306,13 +289,17 @@ func (r *Reader) Peek() rune {
 	return ch
 }
 
+// addKV adds a key/value to the Fields field in a record.
+func addKV(r *rppb.Record, k rppb.Type, v string) {
+	r.Fields = append(r.Fields, &rppb.KeyValue{Key: k, Value: v})
+}
+
 // initRecord initializes the Record struct and gets the stores key/value.
-func (r *Reader) initRecord() (*Record, error) {
-	fieldMap := make(map[KeyWord]string)
-	rec := &Record{Fields: fieldMap}
+func (r *Reader) initRecord() (*rppb.Record, error) {
+	rec := &rppb.Record{Fields: []*rppb.KeyValue{}}
 
 	key, literal := r.findKey()
-	if key == ILLEGAL {
+	if key == rppb.Type_UNKNOWN {
 		return nil, fmt.Errorf("failed to read a keyword found unexpected: %v\n", literal)
 	}
 
@@ -331,7 +318,7 @@ func (r *Reader) initRecord() (*Record, error) {
 	}
 
 	// Add the key/value to the record as well.
-	rec.Fields[key] = val
+	addKV(rec, key, val)
 	if re {
 		return nil, fmt.Errorf("Finished reading a record\n")
 	}
@@ -340,7 +327,7 @@ func (r *Reader) initRecord() (*Record, error) {
 }
 
 // Parse parses through the content sending resulting records into a channel to the caller.
-func Parse(rdr *Reader, rc chan<- *Record) {
+func Parse(rdr *Reader, rc chan<- *rppb.Record) {
 	// Read the file content, return all accumulated records.
 	// Return in case of parsing errors on record/keyword type.
 	// Return in case of reading error.
@@ -353,7 +340,7 @@ func Parse(rdr *Reader, rc chan<- *Record) {
 
 		for {
 			key, literal := rdr.findKey()
-			if key == ILLEGAL {
+			if key == rppb.Type_UNKNOWN {
 				glog.Infof("failed to read a keyword found unexpected: %v\n", literal)
 				break
 			}
@@ -367,7 +354,7 @@ func Parse(rdr *Reader, rc chan<- *Record) {
 
 			val, re, err := rdr.readValue()
 			if err != nil {
-				rec.Fields[key] = val
+				addKV(rec, key, val)
 				rc <- rec
 				if err == io.EOF {
 					// EOF in a read means moving to the next file.
@@ -379,11 +366,7 @@ func Parse(rdr *Reader, rc chan<- *Record) {
 			}
 
 			// Add the key/value to the record as well.
-			if _, ok := rec.Fields[key]; !ok {
-				rec.Fields[key] = val
-			} else {
-				rec.Fields[key] = fmt.Sprintf("%v %v", rec.Fields[key], val)
-			}
+			addKV(rec, key, val)
 
 			if re {
 				break
