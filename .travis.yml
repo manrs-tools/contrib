@@ -6,6 +6,10 @@ go:
   - 1.11.x
   - master
 
+before_install:
+  - cp .netrc ~/.netrc
+  - chmod 600 ~/.netrc
+
 # Contrib is a single repository, which sub projects, change to the sub project and go-test
 script:
   - cd rpsl-parser/
