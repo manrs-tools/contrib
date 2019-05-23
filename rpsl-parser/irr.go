@@ -276,7 +276,7 @@ func (r *Reader) readValue() (string, bool, error) {
 // Peek looks one character ahead, and return to the starting position.
 func (r *Reader) Peek() rune {
 	ch, _, err := r.Read()
-	// Any errror during peek, which is reading an already open file, is 'EOF', return eof.
+	// Any errror during Peek, which is reading an already open file, is 'EOF', return eof.
 	if err != nil {
 		// Log the actual error for later.
 		return eof

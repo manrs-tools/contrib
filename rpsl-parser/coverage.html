@@ -348,7 +348,7 @@ func (r *Reader) readValue() (string, bool, error) <span class="cov8" title="1">
 // Peek looks one character ahead, and return to the starting position.
 func (r *Reader) Peek() rune <span class="cov8" title="1">{
         ch, _, err := r.Read()
-        // Any errror during peek, which is reading an already open file, is 'EOF', return eof.
+        // Any errror during Peek, which is reading an already open file, is 'EOF', return eof.
         if err != nil </span><span class="cov8" title="1">{
                 // Log the actual error for later.
                 return eof
