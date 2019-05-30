@@ -24,7 +24,7 @@ import (
 	"io"
 	"strings"
 
-	rppb "./proto"
+	rppb "github.com/manrs-tools/contrib/rpsl-parser/proto"
 
 	glog "github.com/golang/glog"
 )
