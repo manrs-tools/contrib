@@ -54,7 +54,7 @@
 			<div id="nav">
 				<select id="files">
 
-				<option value="file0">./irr.go (89.4%)</option>
+				<option value="file0">./irr.go (92.6%)</option>
 
 				<option value="file1">./util.go (85.0%)</option>
 
@@ -85,6 +85,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 // Package irr implements a parser for IRR/RPSL data.
 package rpsl
 
@@ -95,6 +96,8 @@ import (
         "io"
         "strings"
 
+        rppb "./proto"
+
         glog "github.com/golang/glog"
 )
 
@@ -102,23 +105,6 @@ import (
 type Reader struct {
         reader *bufio.Reader
 }
-
-// Record is a single IRR record.
-type Record struct {
-        Type   KeyWord
-        Fields map[KeyWord]string // Fields is the whole record indexed by key.
-}
-
-func (r *Record) String() string <span class="cov0" title="0">{
-        var res []string
-        res = append(res, fmt.Sprintf("Type:\t%v", r.Type))
-        for k, v := range r.Fields </span><span class="cov0" title="0">{
-                res = append(res, fmt.Sprintf("%v:\t%v", k, v))
-        }</span>
-        <span class="cov0" title="0">return strings.Join(res, "\n")</span>
-}
-
-type Records []*Record
 
 // NewReader instantiates a new reader object.
 func NewReader(fd io.Reader) *Reader <span class="cov8" title="1">{
@@ -136,190 +122,188 @@ func (r *Reader) Unread() error <span class="cov8" title="1">{
 }</span>
 
 // findKey scans forward until a colon is discovered, returning the keyword found.
-func (r *Reader) findKey() (KeyWord, string) <span class="cov8" title="1">{
+func (r *Reader) findKey() (rppb.Type, string) <span class="cov8" title="1">{
         var buf bytes.Buffer
         for </span><span class="cov8" title="1">{
                 // ReadRule until a colon is found, return the buf and
                 // switch over the type of keyword.
                 ch, _, err := r.Read()
                 if err != nil </span><span class="cov8" title="1">{
-                        return EOF, ""
+                        return rppb.Type_UNKNOWN, ""
                 }</span>
 
                 <span class="cov8" title="1">if IsColon(ch) </span><span class="cov8" title="1">{
                         err := r.Unread()
                         if err != nil </span><span class="cov0" title="0">{
                                 fmt.Printf("failed to unread(%v) on reader.\n", string(ch))
-                                return ILLEGAL, buf.String()
+                                return rppb.Type_UNKNOWN, buf.String()
                         }</span>
 
                         <span class="cov8" title="1">switch strings.ToUpper(buf.String()) </span>{
-                        case "ADDRESS":<span class="cov8" title="1">
-                                return ADDRESS, buf.String()</span>
-                        case "ADMIN-C":<span class="cov8" title="1">
-                                return ADMINC, buf.String()</span>
-                        case "AGGR-BNDRY":<span class="cov8" title="1">
-                                return AGGRBNDRY, buf.String()</span>
-                        case "AGGR-MTD":<span class="cov8" title="1">
-                                return AGGRMTD, buf.String()</span>
-                        case "ALIAS":<span class="cov8" title="1">
-                                return ALIAS, buf.String()</span>
-                        case "AS-NAME":<span class="cov8" title="1">
-                                return ASNAME, buf.String()</span>
-                        case "AS-SET":<span class="cov8" title="1">
-                                return ASSET, buf.String()</span>
-                        case "AUTH":<span class="cov8" title="1">
-                                return AUTH, buf.String()</span>
-                        case "AUT-NUM":<span class="cov8" title="1">
-                                return AUTNUM, buf.String()</span>
-                        case "CERTIF":<span class="cov8" title="1">
-                                return CERTIF, buf.String()</span>
-                        case "CHANGED":<span class="cov8" title="1">
-                                return CHANGED, buf.String()</span>
-                        case "COMPONENTS":<span class="cov8" title="1">
-                                return COMPONENTS, buf.String()</span>
-                        case "COUNTRY":<span class="cov8" title="1">
-                                return COUNTRY, buf.String()</span>
-                        case "DEFAULT":<span class="cov8" title="1">
-                                return DEFAULT, buf.String()</span>
-                        case "DESCR":<span class="cov8" title="1">
-                                return DESCR, buf.String()</span>
-                        case "E-MAIL":<span class="cov8" title="1">
-                                return EMAIL, buf.String()</span>
-                        case "EOF":<span class="cov0" title="0">
-                                return EOF, buf.String()</span>
-                        case "EXPORT":<span class="cov8" title="1">
-                                return EXPORT, buf.String()</span>
-                        case "EXPORT-COMPS":<span class="cov8" title="1">
-                                return EXPORTCOMPS, buf.String()</span>
-                        case "EXPORT-VIA":<span class="cov8" title="1">
-                                return EXPORTVIA, buf.String()</span>
-                        case "FAX-NO":<span class="cov8" title="1">
-                                return FAXNO, buf.String()</span>
-                        case "FILTER":<span class="cov8" title="1">
-                                return FILTER, buf.String()</span>
-                        case "FILTER-SET":<span class="cov8" title="1">
-                                return FILTERSET, buf.String()</span>
-                        case "FINGERPR":<span class="cov8" title="1">
-                                return FINGERPR, buf.String()</span>
-                        case "GEOIDX":<span class="cov8" title="1">
-                                return GEOIDX, buf.String()</span>
-                        case "HOLES":<span class="cov8" title="1">
-                                return HOLES, buf.String()</span>
-                        case "IFADDR":<span class="cov8" title="1">
-                                return IFADDR, buf.String()</span>
-                        case "IMPORT":<span class="cov8" title="1">
-                                return IMPORT, buf.String()</span>
-                        case "IMPORT-VIA":<span class="cov8" title="1">
-                                return IMPORTVIA, buf.String()</span>
-                        case "INET6NUM":<span class="cov8" title="1">
-                                return INET6NUM, buf.String()</span>
-                        case "INETNUM":<span class="cov8" title="1">
-                                return INETNUM, buf.String()</span>
-                        case "INET-RTR":<span class="cov8" title="1">
-                                return INETRTR, buf.String()</span>
-                        case "INTERFACE":<span class="cov8" title="1">
-                                return INTERFACE, buf.String()</span>
-                        case "KEY-CERT":<span class="cov8" title="1">
-                                return KEYCERT, buf.String()</span>
-                        case "LOCAL-AS":<span class="cov8" title="1">
-                                return LOCALAS, buf.String()</span>
-                        case "MBRS-BY-REF":<span class="cov8" title="1">
-                                return MBRSBYREF, buf.String()</span>
-                        case "MEMBER-OF":<span class="cov8" title="1">
-                                return MEMBEROF, buf.String()</span>
-                        case "MEMBERS":<span class="cov8" title="1">
-                                return MEMBERS, buf.String()</span>
-                        case "METHOD":<span class="cov8" title="1">
-                                return METHOD, buf.String()</span>
-                        case "MNT-BY":<span class="cov8" title="1">
-                                return MNTBY, buf.String()</span>
-                        case "MNTNER":<span class="cov8" title="1">
-                                return MNTNER, buf.String()</span>
-                        case "MNT-NFY":<span class="cov8" title="1">
-                                return MNTNFY, buf.String()</span>
-                        case "MP-EXPORT":<span class="cov8" title="1">
-                                return MPEXPORT, buf.String()</span>
-                        case "MP-FILTER":<span class="cov8" title="1">
-                                return MPFILTER, buf.String()</span>
-                        case "MP-IMPORT":<span class="cov8" title="1">
-                                return MPIMPORT, buf.String()</span>
-                        case "MP-MEMBERS":<span class="cov8" title="1">
-                                return MPMEMBERS, buf.String()</span>
-                        case "MP-PEER":<span class="cov8" title="1">
-                                return MPPEER, buf.String()</span>
-                        case "MP-PEERING":<span class="cov8" title="1">
-                                return MPPEERING, buf.String()</span>
-                        case "NETNAME":<span class="cov8" title="1">
-                                return NETNAME, buf.String()</span>
-                        case "NIC-HDL":<span class="cov8" title="1">
-                                return NICHDL, buf.String()</span>
-                        case "NOTIFY":<span class="cov8" title="1">
-                                return NOTIFY, buf.String()</span>
-                        case "ORIGIN":<span class="cov8" title="1">
-                                return ORIGIN, buf.String()</span>
-                        case "OWNER":<span class="cov8" title="1">
-                                return OWNER, buf.String()</span>
-                        case "PEER":<span class="cov8" title="1">
-                                return PEER, buf.String()</span>
-                        case "PEERING":<span class="cov8" title="1">
-                                return PEERING, buf.String()</span>
-                        case "PEERING-SET":<span class="cov8" title="1">
-                                return PEERINGSET, buf.String()</span>
-                        case "PERSON":<span class="cov8" title="1">
-                                return PERSON, buf.String()</span>
-                        case "PHONE":<span class="cov8" title="1">
-                                return PHONE, buf.String()</span>
-                        case "REMARKS":<span class="cov8" title="1">
-                                return REMARKS, buf.String()</span>
-                        case "ROA-URI":<span class="cov8" title="1">
-                                return ROAURI, buf.String()</span>
-                        case "ROLE":<span class="cov8" title="1">
-                                return ROLE, buf.String()</span>
                         case "ROUTE":<span class="cov8" title="1">
-                                return ROUTE, buf.String()</span>
+                                return rppb.Type_ROUTE, buf.String()</span>
                         case "ROUTE6":<span class="cov8" title="1">
-                                return ROUTE6, buf.String()</span>
+                                return rppb.Type_ROUTE6, buf.String()</span>
+                        case "AUT-NUM":<span class="cov8" title="1">
+                                return rppb.Type_AUTNUM, buf.String()</span>
+                        case "AS-SET":<span class="cov8" title="1">
+                                return rppb.Type_ASSET, buf.String()</span>
                         case "ROUTE-SET":<span class="cov8" title="1">
-                                return ROUTESET, buf.String()</span>
-                        case "RS-IN":<span class="cov8" title="1">
-                                return RSIN, buf.String()</span>
-                        case "RS-OUT":<span class="cov8" title="1">
-                                return RSOUT, buf.String()</span>
+                                return rppb.Type_ROUTESET, buf.String()</span>
+                        case "MNTNER":<span class="cov8" title="1">
+                                return rppb.Type_MNTNER, buf.String()</span>
+                        case "PERSON":<span class="cov8" title="1">
+                                return rppb.Type_PERSON, buf.String()</span>
+                        case "INETNUM":<span class="cov8" title="1">
+                                return rppb.Type_INETNUM, buf.String()</span>
+                        case "KEY-CERT":<span class="cov8" title="1">
+                                return rppb.Type_KEYCERT, buf.String()</span>
+                        case "ROLE":<span class="cov8" title="1">
+                                return rppb.Type_ROLE, buf.String()</span>
+                        case "INET-RTR":<span class="cov8" title="1">
+                                return rppb.Type_INETRTR, buf.String()</span>
+                        case "INET6NUM":<span class="cov8" title="1">
+                                return rppb.Type_INET6NUM, buf.String()</span>
+                        case "FILTER-SET":<span class="cov8" title="1">
+                                return rppb.Type_FILTERSET, buf.String()</span>
                         case "RTR-SET":<span class="cov8" title="1">
-                                return RTRSET, buf.String()</span>
+                                return rppb.Type_RTRSET, buf.String()</span>
+                        case "PEERING-SET":<span class="cov8" title="1">
+                                return rppb.Type_PEERINGSET, buf.String()</span>
+                        case "ADDRESS":<span class="cov8" title="1">
+                                return rppb.Type_ADDRESS, buf.String()</span>
+                        case "ADMIN-C":<span class="cov8" title="1">
+                                return rppb.Type_ADMINC, buf.String()</span>
+                        case "AGGR-BNDRY":<span class="cov8" title="1">
+                                return rppb.Type_AGGRBNDRY, buf.String()</span>
+                        case "AGGR-MTD":<span class="cov8" title="1">
+                                return rppb.Type_AGGRMTD, buf.String()</span>
+                        case "ALIAS":<span class="cov8" title="1">
+                                return rppb.Type_ALIAS, buf.String()</span>
+                        case "AS-NAME":<span class="cov8" title="1">
+                                return rppb.Type_ASNAME, buf.String()</span>
+                        case "AUTH":<span class="cov8" title="1">
+                                return rppb.Type_AUTH, buf.String()</span>
+                        case "CERTIF":<span class="cov8" title="1">
+                                return rppb.Type_CERTIF, buf.String()</span>
+                        case "CHANGED":<span class="cov8" title="1">
+                                return rppb.Type_CHANGED, buf.String()</span>
+                        case "COMPONENTS":<span class="cov8" title="1">
+                                return rppb.Type_COMPONENTS, buf.String()</span>
+                        case "COUNTRY":<span class="cov8" title="1">
+                                return rppb.Type_COUNTRY, buf.String()</span>
+                        case "DEFAULT":<span class="cov8" title="1">
+                                return rppb.Type_DEFAULT, buf.String()</span>
+                        case "DESCR":<span class="cov8" title="1">
+                                return rppb.Type_DESCR, buf.String()</span>
+                        case "E-MAIL":<span class="cov8" title="1">
+                                return rppb.Type_EMAIL, buf.String()</span>
+                        case "EXPORT":<span class="cov8" title="1">
+                                return rppb.Type_EXPORT, buf.String()</span>
+                        case "EXPORT-COMPS":<span class="cov8" title="1">
+                                return rppb.Type_EXPORTCOMPS, buf.String()</span>
+                        case "EXPORT-VIA":<span class="cov8" title="1">
+                                return rppb.Type_EXPORTVIA, buf.String()</span>
+                        case "FAX-NO":<span class="cov8" title="1">
+                                return rppb.Type_FAXNO, buf.String()</span>
+                        case "FILTER":<span class="cov8" title="1">
+                                return rppb.Type_FILTER, buf.String()</span>
+                        case "FINGERPR":<span class="cov8" title="1">
+                                return rppb.Type_FINGERPR, buf.String()</span>
+                        case "GEOIDX":<span class="cov8" title="1">
+                                return rppb.Type_GEOIDX, buf.String()</span>
+                        case "HOLES":<span class="cov8" title="1">
+                                return rppb.Type_HOLES, buf.String()</span>
+                        case "IFADDR":<span class="cov8" title="1">
+                                return rppb.Type_IFADDR, buf.String()</span>
+                        case "IMPORT":<span class="cov8" title="1">
+                                return rppb.Type_IMPORT, buf.String()</span>
+                        case "IMPORT-VIA":<span class="cov8" title="1">
+                                return rppb.Type_IMPORTVIA, buf.String()</span>
+                        case "INTERFACE":<span class="cov8" title="1">
+                                return rppb.Type_INTERFACE, buf.String()</span>
+                        case "LOCAL-AS":<span class="cov8" title="1">
+                                return rppb.Type_LOCALAS, buf.String()</span>
+                        case "MBRS-BY-REF":<span class="cov8" title="1">
+                                return rppb.Type_MBRSBYREF, buf.String()</span>
+                        case "MEMBER-OF":<span class="cov8" title="1">
+                                return rppb.Type_MEMBEROF, buf.String()</span>
+                        case "MEMBERS":<span class="cov8" title="1">
+                                return rppb.Type_MEMBERS, buf.String()</span>
+                        case "METHOD":<span class="cov8" title="1">
+                                return rppb.Type_METHOD, buf.String()</span>
+                        case "MNT-BY":<span class="cov8" title="1">
+                                return rppb.Type_MNTBY, buf.String()</span>
+                        case "MNT-NFY":<span class="cov8" title="1">
+                                return rppb.Type_MNTNFY, buf.String()</span>
+                        case "MP-EXPORT":<span class="cov8" title="1">
+                                return rppb.Type_MPEXPORT, buf.String()</span>
+                        case "MP-FILTER":<span class="cov8" title="1">
+                                return rppb.Type_MPFILTER, buf.String()</span>
+                        case "MP-IMPORT":<span class="cov8" title="1">
+                                return rppb.Type_MPIMPORT, buf.String()</span>
+                        case "MP-MEMBERS":<span class="cov8" title="1">
+                                return rppb.Type_MPMEMBERS, buf.String()</span>
+                        case "MP-PEER":<span class="cov8" title="1">
+                                return rppb.Type_MPPEER, buf.String()</span>
+                        case "MP-PEERING":<span class="cov8" title="1">
+                                return rppb.Type_MPPEERING, buf.String()</span>
+                        case "NETNAME":<span class="cov8" title="1">
+                                return rppb.Type_NETNAME, buf.String()</span>
+                        case "NIC-HDL":<span class="cov8" title="1">
+                                return rppb.Type_NICHDL, buf.String()</span>
+                        case "NOTIFY":<span class="cov8" title="1">
+                                return rppb.Type_NOTIFY, buf.String()</span>
+                        case "ORIGIN":<span class="cov8" title="1">
+                                return rppb.Type_ORIGIN, buf.String()</span>
+                        case "OWNER":<span class="cov8" title="1">
+                                return rppb.Type_OWNER, buf.String()</span>
+                        case "PEER":<span class="cov8" title="1">
+                                return rppb.Type_PEER, buf.String()</span>
+                        case "PEERING":<span class="cov8" title="1">
+                                return rppb.Type_PEERING, buf.String()</span>
+                        case "PHONE":<span class="cov8" title="1">
+                                return rppb.Type_PHONE, buf.String()</span>
+                        case "REMARKS":<span class="cov8" title="1">
+                                return rppb.Type_REMARKS, buf.String()</span>
+                        case "ROA-URI":<span class="cov8" title="1">
+                                return rppb.Type_ROAURI, buf.String()</span>
+                        case "RS-IN":<span class="cov8" title="1">
+                                return rppb.Type_RSIN, buf.String()</span>
+                        case "RS-OUT":<span class="cov8" title="1">
+                                return rppb.Type_RSOUT, buf.String()</span>
                         case "SOURCE":<span class="cov8" title="1">
-                                return SOURCE, buf.String()</span>
+                                return rppb.Type_SOURCE, buf.String()</span>
                         case "STATUS":<span class="cov8" title="1">
-                                return STATUS, buf.String()</span>
+                                return rppb.Type_STATUS, buf.String()</span>
                         case "TECH-C":<span class="cov8" title="1">
-                                return TECHC, buf.String()</span>
+                                return rppb.Type_TECHC, buf.String()</span>
                         case "TROUBLE":<span class="cov8" title="1">
-                                return TROUBLE, buf.String()</span>
+                                return rppb.Type_TROUBLE, buf.String()</span>
                         case "UPD-TO":<span class="cov8" title="1">
-                                return UPDTO, buf.String()</span>
+                                return rppb.Type_UPDTO, buf.String()</span>
                         case "*XXE":<span class="cov8" title="1">
-                                return XXE, buf.String()</span>
+                                return rppb.Type_XXE, buf.String()</span>
                         case "*XXNER":<span class="cov8" title="1">
-                                return XXNER, buf.String()</span>
+                                return rppb.Type_XXNER, buf.String()</span>
                         case "*XX-NUM":<span class="cov8" title="1">
-                                return XXNUM, buf.String()</span>
+                                return rppb.Type_XXNUM, buf.String()</span>
                         case "*XXRING-SET":<span class="cov8" title="1">
-                                return XXRINGSET, buf.String()</span>
+                                return rppb.Type_XXRINGSET, buf.String()</span>
                         case "*XXSET":<span class="cov8" title="1">
-                                return XXSET, buf.String()</span>
+                                return rppb.Type_XXSET, buf.String()</span>
                         case "*XXSON":<span class="cov8" title="1">
-                                return XXSON, buf.String()</span>
+                                return rppb.Type_XXSON, buf.String()</span>
                         case "*XXTE":<span class="cov8" title="1">
-                                return XXTE, buf.String()</span>
+                                return rppb.Type_XXTE, buf.String()</span>
                         case "*XXTE6":<span class="cov8" title="1">
-                                return XXTE6, buf.String()</span>
+                                return rppb.Type_XXTE6, buf.String()</span>
                         case "*XXTE-SET":<span class="cov8" title="1">
-                                return XXTESET, buf.String()</span>
+                                return rppb.Type_XXTESET, buf.String()</span>
                         default:<span class="cov8" title="1">
                                 // TODO(morrowc): Log this output instead of printing it to the console.
                                 // fmt.Printf("failed to match whatever is in buf currently: %v\n", buf.String())
-                                return ILLEGAL, buf.String()</span>
+                                return rppb.Type_UNKNOWN, buf.String()</span>
                         }
 
                 }
@@ -345,10 +329,10 @@ func (r *Reader) readValue() (string, bool, error) <span class="cov8" title="1">
 
                 <span class="cov8" title="1">switch </span>{
                 // newline and letter, return value.
-                case IsNewline(ch) &amp;&amp; IsLetter(r.peek()):<span class="cov8" title="1">
+                case IsNewline(ch) &amp;&amp; IsLetter(r.Peek()):<span class="cov8" title="1">
                         return buf.String(), false, nil</span>
                         // newline and newline, return value and end-of-record.
-                case IsNewline(ch) &amp;&amp; (IsNewline(r.peek()) || r.peek() == eof):<span class="cov8" title="1">
+                case IsNewline(ch) &amp;&amp; (IsNewline(r.Peek()) || r.Peek() == eof):<span class="cov8" title="1">
                         // read and discard the current newline and next newline (EOR).
                         _, _, err := r.Read()
                         if err != nil </span><span class="cov8" title="1">{
@@ -361,10 +345,10 @@ func (r *Reader) readValue() (string, bool, error) <span class="cov8" title="1">
         }
 }
 
-// Look one character ahead, and return to the starting position.
-func (r *Reader) peek() rune <span class="cov8" title="1">{
+// Peek looks one character ahead, and return to the starting position.
+func (r *Reader) Peek() rune <span class="cov8" title="1">{
         ch, _, err := r.Read()
-        // Any errror during peek, which is reading an already open file, is 'EOF', return eof.
+        // Any errror during Peek, which is reading an already open file, is 'EOF', return eof.
         if err != nil </span><span class="cov8" title="1">{
                 // Log the actual error for later.
                 return eof
@@ -377,13 +361,17 @@ func (r *Reader) peek() rune <span class="cov8" title="1">{
         <span class="cov8" title="1">return ch</span>
 }
 
+// addKV adds a key/value to the Fields field in a record.
+func addKV(r *rppb.Record, k rppb.Type, v string) <span class="cov8" title="1">{
+        r.Fields = append(r.Fields, &amp;rppb.KeyValue{Key: k, Value: v})
+}</span>
+
 // initRecord initializes the Record struct and gets the stores key/value.
-func (r *Reader) initRecord() (*Record, error) <span class="cov8" title="1">{
-        fieldMap := make(map[KeyWord]string)
-        rec := &amp;Record{Fields: fieldMap}
+func (r *Reader) initRecord() (*rppb.Record, error) <span class="cov8" title="1">{
+        rec := &amp;rppb.Record{Fields: []*rppb.KeyValue{}}
 
         key, literal := r.findKey()
-        if key == ILLEGAL </span><span class="cov8" title="1">{
+        if key == rppb.Type_UNKNOWN </span><span class="cov8" title="1">{
                 return nil, fmt.Errorf("failed to read a keyword found unexpected: %v\n", literal)
         }</span>
 
@@ -402,7 +390,7 @@ func (r *Reader) initRecord() (*Record, error) <span class="cov8" title="1">{
         }
 
         // Add the key/value to the record as well.
-        <span class="cov8" title="1">rec.Fields[key] = val
+        <span class="cov8" title="1">addKV(rec, key, val)
         if re </span><span class="cov8" title="1">{
                 return nil, fmt.Errorf("Finished reading a record\n")
         }</span>
@@ -411,7 +399,7 @@ func (r *Reader) initRecord() (*Record, error) <span class="cov8" title="1">{
 }
 
 // Parse parses through the content sending resulting records into a channel to the caller.
-func Parse(rdr *Reader, rc chan&lt;- *Record) <span class="cov8" title="1">{
+func Parse(rdr *Reader, rc chan&lt;- *rppb.Record) <span class="cov8" title="1">{
         // Read the file content, return all accumulated records.
         // Return in case of parsing errors on record/keyword type.
         // Return in case of reading error.
@@ -424,7 +412,7 @@ func Parse(rdr *Reader, rc chan&lt;- *Record) <span class="cov8" title="1">{
 
                 <span class="cov8" title="1">for </span><span class="cov8" title="1">{
                         key, literal := rdr.findKey()
-                        if key == ILLEGAL </span><span class="cov0" title="0">{
+                        if key == rppb.Type_UNKNOWN </span><span class="cov0" title="0">{
                                 glog.Infof("failed to read a keyword found unexpected: %v\n", literal)
                                 break</span>
                         }
@@ -438,7 +426,7 @@ func Parse(rdr *Reader, rc chan&lt;- *Record) <span class="cov8" title="1">{
 
                         <span class="cov8" title="1">val, re, err := rdr.readValue()
                         if err != nil </span><span class="cov8" title="1">{
-                                rec.Fields[key] = val
+                                addKV(rec, key, val)
                                 rc &lt;- rec
                                 if err == io.EOF </span><span class="cov8" title="1">{
                                         // EOF in a read means moving to the next file.
@@ -450,13 +438,9 @@ func Parse(rdr *Reader, rc chan&lt;- *Record) <span class="cov8" title="1">{
                         }
 
                         // Add the key/value to the record as well.
-                        <span class="cov8" title="1">if _, ok := rec.Fields[key]; !ok </span><span class="cov8" title="1">{
-                                rec.Fields[key] = val
-                        }</span><span class="cov8" title="1"> else {
-                                rec.Fields[key] = fmt.Sprintf("%v %v", rec.Fields[key], val)
-                        }</span>
+                        <span class="cov8" title="1">addKV(rec, key, val)
 
-                        <span class="cov8" title="1">if re </span><span class="cov8" title="1">{
+                        if re </span><span class="cov8" title="1">{
                                 break</span>
                         }
                 }
@@ -480,6 +464,7 @@ func Parse(rdr *Reader, rc chan&lt;- *Record) <span class="cov8" title="1">{
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 package rpsl
 
 // IsLetter validates that the rune is a letter.
@@ -508,7 +493,7 @@ func IsOctothorpe(ch rune) bool <span class="cov8" title="1">{ return (ch == oct
 
 // ConsumeComment reads a full octothorpe intiated comment, and discards it.
 func (r *Reader) ConsumeComment() error <span class="cov8" title="1">{
-        if IsOctothorpe(r.peek()) </span><span class="cov8" title="1">{
+        if IsOctothorpe(r.Peek()) </span><span class="cov8" title="1">{
                 _, _, err := r.Read()
                 if err != nil </span><span class="cov0" title="0">{
                         return err
@@ -531,7 +516,7 @@ func (r *Reader) ConsumeComment() error <span class="cov8" title="1">{
 // Consume leading whitespace from the reader.
 func (r *Reader) ConsumeLeadingWS() error <span class="cov8" title="1">{
         for </span><span class="cov8" title="1">{
-                if !IsWhitespace(r.peek()) </span><span class="cov8" title="1">{
+                if !IsWhitespace(r.Peek()) </span><span class="cov8" title="1">{
                         return nil
                 }</span>
                 <span class="cov8" title="1">_, _, err := r.Read()
@@ -543,7 +528,7 @@ func (r *Reader) ConsumeLeadingWS() error <span class="cov8" title="1">{
 
 // consumeColon reads the colon after a key and all whitespace before the value.
 func (r *Reader) consumeColon() error <span class="cov8" title="1">{
-        if IsColon(r.peek()) </span><span class="cov8" title="1">{
+        if IsColon(r.Peek()) </span><span class="cov8" title="1">{
                 _, _, err := r.Read()
                 if err != nil </span><span class="cov0" title="0">{
                         return err
@@ -560,7 +545,7 @@ func (r *Reader) consumeColon() error <span class="cov8" title="1">{
 // consumeToNewline reads all content until a newline rune is encountered.
 func (r *Reader) consumeToNewline() error <span class="cov8" title="1">{
         for </span><span class="cov8" title="1">{
-                if IsNewline(r.peek()) </span><span class="cov8" title="1">{
+                if IsNewline(r.Peek()) </span><span class="cov8" title="1">{
                         _, _, err := r.Read()
                         if err != nil </span><span class="cov0" title="0">{
                                 return err
