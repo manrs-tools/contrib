@@ -5,6 +5,7 @@ import (
 	"os"
 
 	rpsl "github.com/manrs-tools/contrib/rpsl-parser"
+	rppb "github.com/manrs-tools/contrib/rpsl-parser/proto"
 )
 
 const (
@@ -42,7 +43,7 @@ func main() {
 	}
 
 	// Start to Parse() the reader contents, report results up the channel (rc).
-	rc := make(chan *rpsl.Record)
+	rc := make(chan *rppb.Record)
 	go rpsl.Parse(rdr, rc)
 
 	for rec := range rc {

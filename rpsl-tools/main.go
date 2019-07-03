@@ -29,6 +29,7 @@ import (
 
 	glog "github.com/golang/glog"
 	rpsl "github.com/manrs-tools/contrib/rpsl-parser"
+	rppb "github.com/manrs-tools/contrib/rpsl-parser/proto"
 )
 
 var (
@@ -73,7 +74,7 @@ func getReader(fn string) (io.Reader, error) {
 // parseFile reads and parses files as their filenames arrive on
 // the input channel. A parse error will abort processing for the
 // corresponding file and move to the next one
-func parseFile(ic <-chan string, rc chan<- *rpsl.Record, ec chan<- bool) {
+func parseFile(ic <-chan string, rc chan<- *rppb.Record, ec chan<- bool) {
 	for fn := range ic {
 		var rdr *rpsl.Reader
 
@@ -131,7 +132,7 @@ func main() {
 
 	// Two buffered channels, one for input and for the resulting records.
 	ic := make(chan string, len(rpslFiles))
-	rc := make(chan *rpsl.Record, 100)
+	rc := make(chan *rppb.Record, 100)
 
 	// To signal that all files are done processing,
 	// use ec (end channel) to pass state of 'done with file X'

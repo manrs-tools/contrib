@@ -23,8 +23,8 @@ import (
 	"strings"
 	"testing"
 
-	rppb "./proto"
 	"github.com/google/go-cmp/cmp"
+	rppb "github.com/manrs-tools/contrib/rpsl-parser/proto"
 )
 
 func TestRead(t *testing.T) {
