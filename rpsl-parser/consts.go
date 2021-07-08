@@ -19,7 +19,7 @@ package rpsl
 type KeyWord int
 
 const (
+	colon      = rune(':')
 	eof        = rune(0)
 	octothorpe = rune('#')
-	colon      = rune(':')
 )

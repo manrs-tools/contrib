@@ -54,9 +54,9 @@
 			<div id="nav">
 				<select id="files">
 
-				<option value="file0">./irr.go (92.6%)</option>
+				<option value="file0">/home/morrowc/scripts/git/contrib/rpsl-parser/irr.go (86.2%)</option>
 
-				<option value="file1">./util.go (85.0%)</option>
+				<option value="file1">/home/morrowc/scripts/git/contrib/rpsl-parser/util.go (85.0%)</option>
 
 				</select>
 			</div>
@@ -139,173 +139,17 @@ func (r *Reader) findKey() (rppb.Type, string) <span class="cov8" title="1">{
                                 return rppb.Type_UNKNOWN, buf.String()
                         }</span>
 
-                        <span class="cov8" title="1">switch strings.ToUpper(buf.String()) </span>{
-                        case "ROUTE":<span class="cov8" title="1">
-                                return rppb.Type_ROUTE, buf.String()</span>
-                        case "ROUTE6":<span class="cov8" title="1">
-                                return rppb.Type_ROUTE6, buf.String()</span>
-                        case "AUT-NUM":<span class="cov8" title="1">
-                                return rppb.Type_AUTNUM, buf.String()</span>
-                        case "AS-SET":<span class="cov8" title="1">
-                                return rppb.Type_ASSET, buf.String()</span>
-                        case "ROUTE-SET":<span class="cov8" title="1">
-                                return rppb.Type_ROUTESET, buf.String()</span>
-                        case "MNTNER":<span class="cov8" title="1">
-                                return rppb.Type_MNTNER, buf.String()</span>
-                        case "PERSON":<span class="cov8" title="1">
-                                return rppb.Type_PERSON, buf.String()</span>
-                        case "INETNUM":<span class="cov8" title="1">
-                                return rppb.Type_INETNUM, buf.String()</span>
-                        case "KEY-CERT":<span class="cov8" title="1">
-                                return rppb.Type_KEYCERT, buf.String()</span>
-                        case "ROLE":<span class="cov8" title="1">
-                                return rppb.Type_ROLE, buf.String()</span>
-                        case "INET-RTR":<span class="cov8" title="1">
-                                return rppb.Type_INETRTR, buf.String()</span>
-                        case "INET6NUM":<span class="cov8" title="1">
-                                return rppb.Type_INET6NUM, buf.String()</span>
-                        case "FILTER-SET":<span class="cov8" title="1">
-                                return rppb.Type_FILTERSET, buf.String()</span>
-                        case "RTR-SET":<span class="cov8" title="1">
-                                return rppb.Type_RTRSET, buf.String()</span>
-                        case "PEERING-SET":<span class="cov8" title="1">
-                                return rppb.Type_PEERINGSET, buf.String()</span>
-                        case "ADDRESS":<span class="cov8" title="1">
-                                return rppb.Type_ADDRESS, buf.String()</span>
-                        case "ADMIN-C":<span class="cov8" title="1">
-                                return rppb.Type_ADMINC, buf.String()</span>
-                        case "AGGR-BNDRY":<span class="cov8" title="1">
-                                return rppb.Type_AGGRBNDRY, buf.String()</span>
-                        case "AGGR-MTD":<span class="cov8" title="1">
-                                return rppb.Type_AGGRMTD, buf.String()</span>
-                        case "ALIAS":<span class="cov8" title="1">
-                                return rppb.Type_ALIAS, buf.String()</span>
-                        case "AS-NAME":<span class="cov8" title="1">
-                                return rppb.Type_ASNAME, buf.String()</span>
-                        case "AUTH":<span class="cov8" title="1">
-                                return rppb.Type_AUTH, buf.String()</span>
-                        case "CERTIF":<span class="cov8" title="1">
-                                return rppb.Type_CERTIF, buf.String()</span>
-                        case "CHANGED":<span class="cov8" title="1">
-                                return rppb.Type_CHANGED, buf.String()</span>
-                        case "COMPONENTS":<span class="cov8" title="1">
-                                return rppb.Type_COMPONENTS, buf.String()</span>
-                        case "COUNTRY":<span class="cov8" title="1">
-                                return rppb.Type_COUNTRY, buf.String()</span>
-                        case "DEFAULT":<span class="cov8" title="1">
-                                return rppb.Type_DEFAULT, buf.String()</span>
-                        case "DESCR":<span class="cov8" title="1">
-                                return rppb.Type_DESCR, buf.String()</span>
-                        case "E-MAIL":<span class="cov8" title="1">
-                                return rppb.Type_EMAIL, buf.String()</span>
-                        case "EXPORT":<span class="cov8" title="1">
-                                return rppb.Type_EXPORT, buf.String()</span>
-                        case "EXPORT-COMPS":<span class="cov8" title="1">
-                                return rppb.Type_EXPORTCOMPS, buf.String()</span>
-                        case "EXPORT-VIA":<span class="cov8" title="1">
-                                return rppb.Type_EXPORTVIA, buf.String()</span>
-                        case "FAX-NO":<span class="cov8" title="1">
-                                return rppb.Type_FAXNO, buf.String()</span>
-                        case "FILTER":<span class="cov8" title="1">
-                                return rppb.Type_FILTER, buf.String()</span>
-                        case "FINGERPR":<span class="cov8" title="1">
-                                return rppb.Type_FINGERPR, buf.String()</span>
-                        case "GEOIDX":<span class="cov8" title="1">
-                                return rppb.Type_GEOIDX, buf.String()</span>
-                        case "HOLES":<span class="cov8" title="1">
-                                return rppb.Type_HOLES, buf.String()</span>
-                        case "IFADDR":<span class="cov8" title="1">
-                                return rppb.Type_IFADDR, buf.String()</span>
-                        case "IMPORT":<span class="cov8" title="1">
-                                return rppb.Type_IMPORT, buf.String()</span>
-                        case "IMPORT-VIA":<span class="cov8" title="1">
-                                return rppb.Type_IMPORTVIA, buf.String()</span>
-                        case "INTERFACE":<span class="cov8" title="1">
-                                return rppb.Type_INTERFACE, buf.String()</span>
-                        case "LOCAL-AS":<span class="cov8" title="1">
-                                return rppb.Type_LOCALAS, buf.String()</span>
-                        case "MBRS-BY-REF":<span class="cov8" title="1">
-                                return rppb.Type_MBRSBYREF, buf.String()</span>
-                        case "MEMBER-OF":<span class="cov8" title="1">
-                                return rppb.Type_MEMBEROF, buf.String()</span>
-                        case "MEMBERS":<span class="cov8" title="1">
-                                return rppb.Type_MEMBERS, buf.String()</span>
-                        case "METHOD":<span class="cov8" title="1">
-                                return rppb.Type_METHOD, buf.String()</span>
-                        case "MNT-BY":<span class="cov8" title="1">
-                                return rppb.Type_MNTBY, buf.String()</span>
-                        case "MNT-NFY":<span class="cov8" title="1">
-                                return rppb.Type_MNTNFY, buf.String()</span>
-                        case "MP-EXPORT":<span class="cov8" title="1">
-                                return rppb.Type_MPEXPORT, buf.String()</span>
-                        case "MP-FILTER":<span class="cov8" title="1">
-                                return rppb.Type_MPFILTER, buf.String()</span>
-                        case "MP-IMPORT":<span class="cov8" title="1">
-                                return rppb.Type_MPIMPORT, buf.String()</span>
-                        case "MP-MEMBERS":<span class="cov8" title="1">
-                                return rppb.Type_MPMEMBERS, buf.String()</span>
-                        case "MP-PEER":<span class="cov8" title="1">
-                                return rppb.Type_MPPEER, buf.String()</span>
-                        case "MP-PEERING":<span class="cov8" title="1">
-                                return rppb.Type_MPPEERING, buf.String()</span>
-                        case "NETNAME":<span class="cov8" title="1">
-                                return rppb.Type_NETNAME, buf.String()</span>
-                        case "NIC-HDL":<span class="cov8" title="1">
-                                return rppb.Type_NICHDL, buf.String()</span>
-                        case "NOTIFY":<span class="cov8" title="1">
-                                return rppb.Type_NOTIFY, buf.String()</span>
-                        case "ORIGIN":<span class="cov8" title="1">
-                                return rppb.Type_ORIGIN, buf.String()</span>
-                        case "OWNER":<span class="cov8" title="1">
-                                return rppb.Type_OWNER, buf.String()</span>
-                        case "PEER":<span class="cov8" title="1">
-                                return rppb.Type_PEER, buf.String()</span>
-                        case "PEERING":<span class="cov8" title="1">
-                                return rppb.Type_PEERING, buf.String()</span>
-                        case "PHONE":<span class="cov8" title="1">
-                                return rppb.Type_PHONE, buf.String()</span>
-                        case "REMARKS":<span class="cov8" title="1">
-                                return rppb.Type_REMARKS, buf.String()</span>
-                        case "ROA-URI":<span class="cov8" title="1">
-                                return rppb.Type_ROAURI, buf.String()</span>
-                        case "RS-IN":<span class="cov8" title="1">
-                                return rppb.Type_RSIN, buf.String()</span>
-                        case "RS-OUT":<span class="cov8" title="1">
-                                return rppb.Type_RSOUT, buf.String()</span>
-                        case "SOURCE":<span class="cov8" title="1">
-                                return rppb.Type_SOURCE, buf.String()</span>
-                        case "STATUS":<span class="cov8" title="1">
-                                return rppb.Type_STATUS, buf.String()</span>
-                        case "TECH-C":<span class="cov8" title="1">
-                                return rppb.Type_TECHC, buf.String()</span>
-                        case "TROUBLE":<span class="cov8" title="1">
-                                return rppb.Type_TROUBLE, buf.String()</span>
-                        case "UPD-TO":<span class="cov8" title="1">
-                                return rppb.Type_UPDTO, buf.String()</span>
-                        case "*XXE":<span class="cov8" title="1">
-                                return rppb.Type_XXE, buf.String()</span>
-                        case "*XXNER":<span class="cov8" title="1">
-                                return rppb.Type_XXNER, buf.String()</span>
-                        case "*XX-NUM":<span class="cov8" title="1">
-                                return rppb.Type_XXNUM, buf.String()</span>
-                        case "*XXRING-SET":<span class="cov8" title="1">
-                                return rppb.Type_XXRINGSET, buf.String()</span>
-                        case "*XXSET":<span class="cov8" title="1">
-                                return rppb.Type_XXSET, buf.String()</span>
-                        case "*XXSON":<span class="cov8" title="1">
-                                return rppb.Type_XXSON, buf.String()</span>
-                        case "*XXTE":<span class="cov8" title="1">
-                                return rppb.Type_XXTE, buf.String()</span>
-                        case "*XXTE6":<span class="cov8" title="1">
-                                return rppb.Type_XXTE6, buf.String()</span>
-                        case "*XXTE-SET":<span class="cov8" title="1">
-                                return rppb.Type_XXTESET, buf.String()</span>
-                        default:<span class="cov8" title="1">
-                                // TODO(morrowc): Log this output instead of printing it to the console.
-                                // fmt.Printf("failed to match whatever is in buf currently: %v\n", buf.String())
-                                return rppb.Type_UNKNOWN, buf.String()</span>
-                        }
+                        <span class="cov8" title="1">key := strings.ToUpper(buf.String())
+                        ret := buf.String()
+                        // Some RPSL keywords have '-' or '*' in them, the proto enum does not have
+                        // these characters included, remove them from the key comparison.
+                        key = strings.Replace(key, "-", "", -1)
+                        key = strings.Replace(key, "*", "", -1)
 
+                        if _, ok := rppb.Type_value[key]; !ok </span><span class="cov8" title="1">{
+                                return rppb.Type_UNKNOWN, ret
+                        }</span>
+                        <span class="cov8" title="1">return rppb.Type(rppb.Type_value[key]), ret</span>
                 }
                 // Each loop through accumulates more in the buffer.
                 <span class="cov8" title="1">_, _ = buf.WriteRune(ch)</span>
