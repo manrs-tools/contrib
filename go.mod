@@ -9,4 +9,4 @@ require (
 	github.com/manrs-tools/contrib v0.0.0-20190703155503-b9ddd2b08592
 )
 
-require google.golang.org/protobuf v1.26.0 // indirect
+require google.golang.org/protobuf v1.27.1 // indirect

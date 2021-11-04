@@ -16,16 +16,6 @@
 
 package rpsl
 
-// IsLetter validates that the rune is a letter.
-func IsLetter(ch rune) bool {
-	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
-}
-
-// IsDigit validates that the rune is a number.
-func isDigit(ch rune) bool {
-	return (ch >= '0' && ch <= '9')
-}
-
 // IsWhitespace validates if the rune is a space or tab.
 func IsWhitespace(ch rune) bool {
 	return ch == ' ' || ch == '\t' || ch == '\n'
