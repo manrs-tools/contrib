@@ -20,13 +20,14 @@ package rpsl
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
+	"unicode"
 
+	"github.com/golang/glog"
 	rppb "github.com/manrs-tools/contrib/rpsl-parser/proto"
-
-	glog "github.com/golang/glog"
 )
 
 // Reader is a struct to manage access to the irr database file.
@@ -257,7 +258,7 @@ func (r *Reader) readValue() (string, bool, error) {
 
 		switch {
 		// newline and letter, return value.
-		case IsNewline(ch) && IsLetter(r.Peek()):
+		case IsNewline(ch) && unicode.IsLetter(r.Peek()):
 			return buf.String(), false, nil
 			// newline and newline, return value and end-of-record.
 		case IsNewline(ch) && (IsNewline(r.Peek()) || r.Peek() == eof):
@@ -300,7 +301,7 @@ func (r *Reader) initRecord() (*rppb.Record, error) {
 
 	key, literal := r.findKey()
 	if key == rppb.Type_UNKNOWN {
-		return nil, fmt.Errorf("failed to read a keyword found unexpected: %v\n", literal)
+		return nil, fmt.Errorf("failed to read a keyword found unexpected: %v", literal)
 	}
 
 	err := r.consumeColon()
@@ -314,13 +315,13 @@ func (r *Reader) initRecord() (*rppb.Record, error) {
 		if err == io.EOF {
 			return nil, err
 		}
-		return nil, fmt.Errorf("failure reading value: %v\n", err)
+		return nil, fmt.Errorf("failure reading value: %v", err)
 	}
 
 	// Add the key/value to the record as well.
 	addKV(rec, key, val)
 	if re {
-		return nil, fmt.Errorf("Finished reading a record\n")
+		return nil, errors.New("finished reading a record")
 	}
 
 	return rec, nil

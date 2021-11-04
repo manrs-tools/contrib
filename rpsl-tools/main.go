@@ -27,7 +27,7 @@ import (
 	"os"
 	"strings"
 
-	glog "github.com/golang/glog"
+	"github.com/golang/glog"
 	rpsl "github.com/manrs-tools/contrib/rpsl-parser"
 	rppb "github.com/manrs-tools/contrib/rpsl-parser/proto"
 )
