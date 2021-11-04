@@ -557,7 +557,6 @@ func TestReadValue(t *testing.T) {
 			}
 		}
 	}
-
 }
 
 func TestPeek(t *testing.T) {
@@ -598,11 +597,12 @@ func TestInitRecord(t *testing.T) {
 		want: rppb.Record{
 			Type: rppb.Type_AUTNUM,
 			Fields: []*rppb.KeyValue{
-				&rppb.KeyValue{
+				{
 					Key:   rppb.Type_AUTNUM,
 					Value: "7046",
 				},
-			}},
+			},
+		},
 	}, {
 		desc:    "Fail IllegalKey",
 		input:   "foo: bar\nbaz: bling\n",
@@ -683,15 +683,16 @@ func TestParse(t *testing.T) {
 		want: rppb.Record{
 			Type: rppb.Type_AUTNUM,
 			Fields: []*rppb.KeyValue{
-				&rppb.KeyValue{Key: rppb.Type_AUTNUM, Value: "AS372"},
-				&rppb.KeyValue{Key: rppb.Type_ASNAME, Value: "UNSPECIFIED"},
-				&rppb.KeyValue{Key: rppb.Type_DESCR, Value: "Nasa Science Network (FIX-West)"},
-				&rppb.KeyValue{Key: rppb.Type_ADMINC, Value: "Not available"},
-				&rppb.KeyValue{Key: rppb.Type_TECHC, Value: "See MAINT-AS372"},
-				&rppb.KeyValue{Key: rppb.Type_MNTBY, Value: "MAINT-AS372"},
-				&rppb.KeyValue{Key: rppb.Type_CHANGED, Value: "DB-admin@merit.edu 19950201"},
-				&rppb.KeyValue{Key: rppb.Type_SOURCE, Value: "RADB"},
-			}},
+				{Key: rppb.Type_AUTNUM, Value: "AS372"},
+				{Key: rppb.Type_ASNAME, Value: "UNSPECIFIED"},
+				{Key: rppb.Type_DESCR, Value: "Nasa Science Network (FIX-West)"},
+				{Key: rppb.Type_ADMINC, Value: "Not available"},
+				{Key: rppb.Type_TECHC, Value: "See MAINT-AS372"},
+				{Key: rppb.Type_MNTBY, Value: "MAINT-AS372"},
+				{Key: rppb.Type_CHANGED, Value: "DB-admin@merit.edu 19950201"},
+				{Key: rppb.Type_SOURCE, Value: "RADB"},
+			},
+		},
 		rec:  0,
 		recs: 1,
 	}, {
@@ -700,20 +701,21 @@ func TestParse(t *testing.T) {
 		want: rppb.Record{
 			Type: rppb.Type_ASSET,
 			Fields: []*rppb.KeyValue{
-				&rppb.KeyValue{Key: rppb.Type_ASSET, Value: "AS-CENTRILOGIC-UK:AS-CUSTOMERS"},
-				&rppb.KeyValue{Key: rppb.Type_DESCR, Value: "CentriLogic (UK Network) Customer ASNs"},
-				&rppb.KeyValue{Key: rppb.Type_MEMBERS, Value: "AS204018"},
-				&rppb.KeyValue{Key: rppb.Type_MEMBERS, Value: "AS33459"},
-				&rppb.KeyValue{Key: rppb.Type_ADMINC, Value: "CentriLogic IP Tech"},
-				&rppb.KeyValue{Key: rppb.Type_TECHC, Value: "CentriLogic IP Tech"},
-				&rppb.KeyValue{Key: rppb.Type_NOTIFY, Value: "iptech@centrilogic.com"},
-				&rppb.KeyValue{Key: rppb.Type_MNTBY, Value: "MAINT-AS19693"},
-				&rppb.KeyValue{
+				{Key: rppb.Type_ASSET, Value: "AS-CENTRILOGIC-UK:AS-CUSTOMERS"},
+				{Key: rppb.Type_DESCR, Value: "CentriLogic (UK Network) Customer ASNs"},
+				{Key: rppb.Type_MEMBERS, Value: "AS204018"},
+				{Key: rppb.Type_MEMBERS, Value: "AS33459"},
+				{Key: rppb.Type_ADMINC, Value: "CentriLogic IP Tech"},
+				{Key: rppb.Type_TECHC, Value: "CentriLogic IP Tech"},
+				{Key: rppb.Type_NOTIFY, Value: "iptech@centrilogic.com"},
+				{Key: rppb.Type_MNTBY, Value: "MAINT-AS19693"},
+				{
 					Key:   rppb.Type_CHANGED,
 					Value: "IPtech@centrilogic.com 20180614  #14:42:22Z",
 				},
-				&rppb.KeyValue{Key: rppb.Type_SOURCE, Value: "RADB"},
-			}},
+				{Key: rppb.Type_SOURCE, Value: "RADB"},
+			},
+		},
 		rec:  0,
 		recs: 1,
 	}, {
@@ -722,15 +724,16 @@ func TestParse(t *testing.T) {
 		want: rppb.Record{
 			Type: rppb.Type_AUTNUM,
 			Fields: []*rppb.KeyValue{
-				&rppb.KeyValue{Key: rppb.Type_AUTNUM, Value: "AS1263"},
-				&rppb.KeyValue{Key: rppb.Type_ASNAME, Value: "NSN-TEST-AS"},
-				&rppb.KeyValue{Key: rppb.Type_DESCR, Value: "NSN-TEST-AS"},
-				&rppb.KeyValue{Key: rppb.Type_ADMINC, Value: "Not available"},
-				&rppb.KeyValue{Key: rppb.Type_TECHC, Value: "See MAINT-AS1263"},
-				&rppb.KeyValue{Key: rppb.Type_MNTBY, Value: "MAINT-AS1263"},
-				&rppb.KeyValue{Key: rppb.Type_CHANGED, Value: "DB-admin@merit.edu 19950201"},
-				&rppb.KeyValue{Key: rppb.Type_SOURCE, Value: "RADB"},
-			}},
+				{Key: rppb.Type_AUTNUM, Value: "AS1263"},
+				{Key: rppb.Type_ASNAME, Value: "NSN-TEST-AS"},
+				{Key: rppb.Type_DESCR, Value: "NSN-TEST-AS"},
+				{Key: rppb.Type_ADMINC, Value: "Not available"},
+				{Key: rppb.Type_TECHC, Value: "See MAINT-AS1263"},
+				{Key: rppb.Type_MNTBY, Value: "MAINT-AS1263"},
+				{Key: rppb.Type_CHANGED, Value: "DB-admin@merit.edu 19950201"},
+				{Key: rppb.Type_SOURCE, Value: "RADB"},
+			},
+		},
 		rec:  1,
 		recs: 2,
 	}, {
@@ -739,15 +742,16 @@ func TestParse(t *testing.T) {
 		want: rppb.Record{
 			Type: rppb.Type_ROUTESET,
 			Fields: []*rppb.KeyValue{
-				&rppb.KeyValue{Key: rppb.Type_ROUTESET, Value: "RS-CTB-NOVA"},
-				&rppb.KeyValue{Key: rppb.Type_MEMBERS, Value: "138.0.96.0/22,\n            143.0.128.0/22,\n            167.249.164.0/22,\n            168.195.104.0/22,\n            192.141.100.0/22,\n+\n            192.141.100.0/24"},
-				&rppb.KeyValue{Key: rppb.Type_MPMEMBERS, Value: "2804:2138::/32,\n            2804:2c04::/32,\n            2804:42bc::/32"},
-				&rppb.KeyValue{Key: rppb.Type_DESCR, Value: "CTB's customer"},
-				&rppb.KeyValue{Key: rppb.Type_REMARKS, Value: "ASN 264543"},
-				&rppb.KeyValue{Key: rppb.Type_MNTBY, Value: "MAINT-AS36678"},
-				&rppb.KeyValue{Key: rppb.Type_CHANGED, Value: "jiangz@ctamericas.com 20180614  #21:22:22Z"},
-				&rppb.KeyValue{Key: rppb.Type_SOURCE, Value: "RADB"},
-			}},
+				{Key: rppb.Type_ROUTESET, Value: "RS-CTB-NOVA"},
+				{Key: rppb.Type_MEMBERS, Value: "138.0.96.0/22,\n            143.0.128.0/22,\n            167.249.164.0/22,\n            168.195.104.0/22,\n            192.141.100.0/22,\n+\n            192.141.100.0/24"},
+				{Key: rppb.Type_MPMEMBERS, Value: "2804:2138::/32,\n            2804:2c04::/32,\n            2804:42bc::/32"},
+				{Key: rppb.Type_DESCR, Value: "CTB's customer"},
+				{Key: rppb.Type_REMARKS, Value: "ASN 264543"},
+				{Key: rppb.Type_MNTBY, Value: "MAINT-AS36678"},
+				{Key: rppb.Type_CHANGED, Value: "jiangz@ctamericas.com 20180614  #21:22:22Z"},
+				{Key: rppb.Type_SOURCE, Value: "RADB"},
+			},
+		},
 		rec:  0,
 		recs: 1,
 	}}

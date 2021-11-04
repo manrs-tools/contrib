@@ -8,7 +8,7 @@ Reads an IRR/RPSL file, parsing each record into a Google Protobuf,
 the protobuf is defined in rpsl-parser/proto/.
 
 Example usage of this library is in:
-exanples/...
+examples/...
 
 the example parses the contents of the file: /tmp/radb.db
 and outputs records when run:
