@@ -28,7 +28,7 @@ import (
 	"strings"
 
 	"github.com/golang/glog"
-	rpsl "github.com/manrs-tools/contrib/rpsl-parser"
+	"github.com/manrs-tools/contrib/rpsl-parser"
 	rppb "github.com/manrs-tools/contrib/rpsl-parser/proto"
 )
 
@@ -71,11 +71,18 @@ func getReader(fn string) (io.Reader, error) {
 	return fd, nil
 }
 
+func prepWorker(ic <-chan string) <-chan *rppb.Record {
+	ch := make(chan *rppb.Record, 100)
+	go parseFile(ic, ch)
+	return ch
+}
+
 // parseFile reads and parses files as their filenames arrive on
 // the input channel. A parse error will abort processing for the
 // corresponding file and move to the next one
-func parseFile(ic <-chan string, rc chan<- *rppb.Record, ec chan<- bool) {
+func parseFile(ic <-chan string, ch chan *rppb.Record) {
 	for fn := range ic {
+		//files++
 		var rdr *rpsl.Reader
 
 		reader, err := getReader(fn)
@@ -110,14 +117,19 @@ func parseFile(ic <-chan string, rc chan<- *rppb.Record, ec chan<- bool) {
 		}
 
 		// Parse the file, sending results back up the channel (rc).
-		rpsl.Parse(rdr, rc)
+		rpsl.Parse(rdr, ch)
+	}
 
-		// When done parsing, send a file-done message on the end channel (ec).
-		ec <- true
+	close(ch)
+}
+
+func displayRecords(rc <-chan *rppb.Record) {
+	for v := range rc {
+		fmt.Printf("Record returned: %v\n", v)
 	}
 }
 
-// Verify that there files requested exist, open each in a goroutine and feed
+// Verify that the files requested exist, open each in a goroutine and feed
 // those to the rpsl-parser library, returning each record to a channel for
 // disposition in the final data structure to be loaded into a DB.
 func main() {
@@ -130,19 +142,8 @@ func main() {
 		return
 	}
 
-	// Two buffered channels, one for input and for the resulting records.
 	ic := make(chan string, len(rpslFiles))
-	rc := make(chan *rppb.Record, 100)
-
-	// To signal that all files are done processing,
-	// use ec (end channel) to pass state of 'done with file X'
-	// to the Record processor.
-	ec := make(chan bool, len(rpslFiles))
-
-	// Start the parsing/worker thread
-	for i := 0; i < *threads; i++ {
-		go parseFile(ic, rc, ec)
-	}
+	var allRecords []<-chan *rppb.Record
 
 	// Push each file into the input (ic) channel.
 	for _, fn := range rpslFiles {
@@ -150,27 +151,18 @@ func main() {
 	}
 	close(ic)
 
-	// Track the number of files completed.
-	files := 0
-	// Read records from the channel,
-	// TODO(morrowc): I'm positive this is supposed to be simpler with
-	// a sync.WaitGroup. Investigate that later.
-Loop:
-	for {
-		select {
-		case r := <-rc:
-			fmt.Printf("Record returned: %v\n", r)
-			if files == len(rpslFiles) && len(rc) == 0 {
-				break Loop
-			}
-		case <-ec:
-			files++
-			if files == len(rpslFiles) && len(rc) == 0 {
-				break Loop
-			}
-		default:
-		}
+	// Start the parsing/worker thread
+	// TODO: if len(files) < threads, just use len(files)
+	for i := 0; i < *threads; i++ {
+		records := prepWorker(ic)
+		allRecords = append(allRecords, records)
+	}
+	fmt.Println("about to wait")
+	fmt.Println("finished waiting")
+
+	for _, v := range allRecords {
+		displayRecords(v)
 	}
 
-	close(rc)
+	//fmt.Printf("Processed with %d records", len(rc))
 }
