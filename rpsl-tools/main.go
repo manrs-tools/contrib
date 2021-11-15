@@ -27,10 +27,10 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"unicode"
 
 	"github.com/golang/glog"
 	"github.com/manrs-tools/contrib/rpsl-parser"
-	rppb "github.com/manrs-tools/contrib/rpsl-parser/proto"
 )
 
 var (
@@ -76,7 +76,7 @@ func getReader(fn string) (io.Reader, error) {
 // parseFile reads and parses files as their filenames arrive on
 // the input channel. A parse error will abort processing for the
 // corresponding file and move to the next one
-func parseFile(fn string, sem chan int, rc chan *rppb.Record, wg *sync.WaitGroup) {
+func parseFile(fn string, sem chan int, records *rpsl.Records, wg *sync.WaitGroup) {
 	defer wg.Done()
 	sem <- 1
 
@@ -106,7 +106,7 @@ func parseFile(fn string, sem chan int, rc chan *rppb.Record, wg *sync.WaitGroup
 
 	// The file must start with a letter, all IRR records start with a letter character.
 	r := rdr.Peek()
-	if !rpsl.IsLetter(r) {
+	if !unicode.IsLetter(r) {
 		glog.Infof("The first character read(%v) is not a letter, file unparsable.\n", string(r))
 		// Add 2 more chars so finding the problem is more possible.
 		r, _, _ := rdr.Read()
@@ -118,7 +118,7 @@ func parseFile(fn string, sem chan int, rc chan *rppb.Record, wg *sync.WaitGroup
 	}
 
 	// Parse the file, sending results back up the channel (rc).
-	rpsl.Parse(rdr, rc)
+	rpsl.Parse(rdr, records)
 	<-sem
 }
 
@@ -128,6 +128,7 @@ func parseFile(fn string, sem chan int, rc chan *rppb.Record, wg *sync.WaitGroup
 func main() {
 	//defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
 	//defer profile.Start(profile.MemProfile, profile.ProfilePath(".")).Stop()
+	//defer profile.Start(profile.TraceProfile, profile.ProfilePath(".")).Stop()
 
 	flag.Var(&rpslFiles, "rpslFiles", "Files to parse, irr/rpsl content, filenames as csv.")
 	flag.Parse()
@@ -143,27 +144,15 @@ func main() {
 		*threads = numFiles
 	}
 
+	var records rpsl.Records
+
 	sem := make(chan int, *threads)
 	var wg sync.WaitGroup
 	wg.Add(numFiles)
-
-	rc := make(chan *rppb.Record)
-
-	var records []*rppb.Record
-	go func(ch <-chan *rppb.Record) {
-		for v := range ch {
-			if *display {
-				fmt.Printf("Received record: %v\n", v)
-			}
-			records = append(records, v)
-		}
-	}(rc)
-
 	for _, fn := range rpslFiles {
-		go parseFile(fn, sem, rc, &wg)
+		go parseFile(fn, sem, &records, &wg)
 	}
 	wg.Wait()
-	close(rc)
 
-	fmt.Printf("Received a total of %d records\n", len(records))
+	fmt.Printf("Received a total of %d records\n", len(records.Records))
 }
