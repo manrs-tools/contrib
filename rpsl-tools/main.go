@@ -26,14 +26,16 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sync"
+	"unicode"
 
-	glog "github.com/golang/glog"
-	rpsl "github.com/manrs-tools/contrib/rpsl-parser"
-	rppb "github.com/manrs-tools/contrib/rpsl-parser/proto"
+	"github.com/golang/glog"
+	"github.com/manrs-tools/contrib/rpsl-parser"
 )
 
 var (
 	threads = flag.Int("threads", 4, "Max threads to use in parsing db files.")
+	display = flag.Bool("display", false, "Display decoded records on screen")
 )
 
 // Define a slice of filenames to get as a single flag on startup.
@@ -74,53 +76,60 @@ func getReader(fn string) (io.Reader, error) {
 // parseFile reads and parses files as their filenames arrive on
 // the input channel. A parse error will abort processing for the
 // corresponding file and move to the next one
-func parseFile(ic <-chan string, rc chan<- *rppb.Record, ec chan<- bool) {
-	for fn := range ic {
-		var rdr *rpsl.Reader
+func parseFile(fn string, sem chan int, records *rpsl.Records, wg *sync.WaitGroup) {
+	defer wg.Done()
+	sem <- 1
 
-		reader, err := getReader(fn)
-		if err != nil {
-			glog.Infof("Failed to read file(%v): %v\n", fn, err)
-			continue
-		}
-		rdr = rpsl.NewReader(reader)
+	var rdr *rpsl.Reader
 
-		// Read all leading comments and whitespace.
-		err = rdr.ConsumeComment()
-		if err != nil {
-			glog.Infof("Failed reading file(%v): %v\n", fn, err)
-			continue
-		}
-		err = rdr.ConsumeLeadingWS()
-		if err != nil {
-			glog.Infof("Failed reading file(%v): %v\n", fn, err)
-			continue
-		}
-
-		// The file must start with a letter, all IRR records start with a letter character.
-		r := rdr.Peek()
-		if !rpsl.IsLetter(r) {
-			glog.Infof("The first character read(%v) is not a letter, file unparsable.\n", string(r))
-			// Add 2 more chars so finding the problem is more possible.
-			r, _, _ := rdr.Read()
-			glog.Infof("Next char: %v\n", string(r))
-			r, _, _ = rdr.Read()
-			glog.Infof("Next char: %v\n", string(r))
-			continue
-		}
-
-		// Parse the file, sending results back up the channel (rc).
-		rpsl.Parse(rdr, rc)
-
-		// When done parsing, send a file-done message on the end channel (ec).
-		ec <- true
+	reader, err := getReader(fn)
+	if err != nil {
+		glog.Infof("Failed to read file(%v): %v\n", fn, err)
+		<-sem
+		return
 	}
+	rdr = rpsl.NewReader(reader)
+
+	// Read all leading comments and whitespace.
+	err = rdr.ConsumeComment()
+	if err != nil {
+		glog.Infof("Failed reading file(%v): %v\n", fn, err)
+		<-sem
+		return
+	}
+	err = rdr.ConsumeLeadingWS()
+	if err != nil {
+		glog.Infof("Failed reading file(%v): %v\n", fn, err)
+		<-sem
+		return
+	}
+
+	// The file must start with a letter, all IRR records start with a letter character.
+	r := rdr.Peek()
+	if !unicode.IsLetter(r) {
+		glog.Infof("The first character read(%v) is not a letter, file unparsable.\n", string(r))
+		// Add 2 more chars so finding the problem is more possible.
+		r, _, _ := rdr.Read()
+		glog.Infof("Next char: %v\n", string(r))
+		r, _, _ = rdr.Read()
+		glog.Infof("Next char: %v\n", string(r))
+		<-sem
+		return
+	}
+
+	// Parse the file, sending results back up the channel (rc).
+	rpsl.Parse(rdr, records)
+	<-sem
 }
 
-// Verify that there files requested exist, open each in a goroutine and feed
+// Verify that the files requested exist, open each in a goroutine and feed
 // those to the rpsl-parser library, returning each record to a channel for
 // disposition in the final data structure to be loaded into a DB.
 func main() {
+	//defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+	//defer profile.Start(profile.MemProfile, profile.ProfilePath(".")).Stop()
+	//defer profile.Start(profile.TraceProfile, profile.ProfilePath(".")).Stop()
+
 	flag.Var(&rpslFiles, "rpslFiles", "Files to parse, irr/rpsl content, filenames as csv.")
 	flag.Parse()
 
@@ -129,48 +138,21 @@ func main() {
 		flag.PrintDefaults()
 		return
 	}
-
-	// Two buffered channels, one for input and for the resulting records.
-	ic := make(chan string, len(rpslFiles))
-	rc := make(chan *rppb.Record, 100)
-
-	// To signal that all files are done processing,
-	// use ec (end channel) to pass state of 'done with file X'
-	// to the Record processor.
-	ec := make(chan bool, len(rpslFiles))
-
-	// Start the parsing/worker thread
-	for i := 0; i < *threads; i++ {
-		go parseFile(ic, rc, ec)
+	numFiles := len(rpslFiles)
+	// If the amount of file is less than threads, only spin up enough threads for those files
+	if numFiles < *threads {
+		*threads = numFiles
 	}
 
-	// Push each file into the input (ic) channel.
+	var records rpsl.Records
+
+	sem := make(chan int, *threads)
+	var wg sync.WaitGroup
+	wg.Add(numFiles)
 	for _, fn := range rpslFiles {
-		ic <- fn
+		go parseFile(fn, sem, &records, &wg)
 	}
-	close(ic)
+	wg.Wait()
 
-	// Track the number of files completed.
-	files := 0
-	// Read records from the channel,
-	// TODO(morrowc): I'm positive this is supposed to be simpler with
-	// a sync.WaitGroup. Investigate that later.
-Loop:
-	for {
-		select {
-		case r := <-rc:
-			fmt.Printf("Record returned: %v\n", r)
-			if files == len(rpslFiles) && len(rc) == 0 {
-				break Loop
-			}
-		case <-ec:
-			files++
-			if files == len(rpslFiles) && len(rc) == 0 {
-				break Loop
-			}
-		default:
-		}
-	}
-
-	close(rc)
+	fmt.Printf("Received a total of %d records\n", len(records.Records))
 }

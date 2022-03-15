@@ -20,14 +20,27 @@ package rpsl
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
+	"sync"
+	"unicode"
 
+	"github.com/golang/glog"
 	rppb "github.com/manrs-tools/contrib/rpsl-parser/proto"
-
-	glog "github.com/golang/glog"
 )
+
+type Records struct {
+	Records []*rppb.Record
+	mu      sync.Mutex
+}
+
+func (r *Records) AddRecord(record *rppb.Record) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.Records = append(r.Records, record)
+}
 
 // Reader is a struct to manage access to the irr database file.
 type Reader struct {
@@ -101,7 +114,7 @@ func (r *Reader) readValue() (string, bool, error) {
 
 		switch {
 		// newline and letter, return value.
-		case IsNewline(ch) && IsLetter(r.Peek()):
+		case IsNewline(ch) && unicode.IsLetter(r.Peek()):
 			return buf.String(), false, nil
 			// newline and newline, return value and end-of-record.
 		case IsNewline(ch) && (IsNewline(r.Peek()) || r.Peek() == eof):
@@ -144,7 +157,7 @@ func (r *Reader) initRecord() (*rppb.Record, error) {
 
 	key, literal := r.findKey()
 	if key == rppb.Type_UNKNOWN {
-		return nil, fmt.Errorf("failed to read a keyword found unexpected: %v\n", literal)
+		return nil, fmt.Errorf("failed to read a keyword found unexpected: %v", literal)
 	}
 
 	err := r.consumeColon()
@@ -158,20 +171,20 @@ func (r *Reader) initRecord() (*rppb.Record, error) {
 		if err == io.EOF {
 			return nil, err
 		}
-		return nil, fmt.Errorf("failure reading value: %v\n", err)
+		return nil, fmt.Errorf("failure reading value: %v", err)
 	}
 
 	// Add the key/value to the record as well.
 	addKV(rec, key, val)
 	if re {
-		return nil, fmt.Errorf("Finished reading a record\n")
+		return nil, errors.New("finished reading a record")
 	}
 
 	return rec, nil
 }
 
 // Parse parses through the content sending resulting records into a channel to the caller.
-func Parse(rdr *Reader, rc chan<- *rppb.Record) {
+func Parse(rdr *Reader, records *Records) {
 	// Read the file content, return all accumulated records.
 	// Return in case of parsing errors on record/keyword type.
 	// Return in case of reading error.
@@ -191,7 +204,7 @@ func Parse(rdr *Reader, rc chan<- *rppb.Record) {
 
 			err := rdr.consumeColon()
 			if err != nil {
-				rc <- rec
+				records.AddRecord(rec)
 				glog.Infof("failed to consume a key's colon separator: %v", err)
 				break
 			}
@@ -199,7 +212,7 @@ func Parse(rdr *Reader, rc chan<- *rppb.Record) {
 			val, re, err := rdr.readValue()
 			if err != nil {
 				addKV(rec, key, val)
-				rc <- rec
+				records.AddRecord(rec)
 				if err == io.EOF {
 					// EOF in a read means moving to the next file.
 					glog.Infof("found an EOF while reading a value: %v", err)
@@ -216,6 +229,6 @@ func Parse(rdr *Reader, rc chan<- *rppb.Record) {
 				break
 			}
 		}
-		rc <- rec
+		records.AddRecord(rec)
 	}
 }

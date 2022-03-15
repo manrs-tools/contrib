@@ -22,52 +22,6 @@ import (
 	"testing"
 )
 
-func TestIsLetter(t *testing.T) {
-	tests := []struct {
-		desc string
-		char rune
-		want bool
-	}{{
-		desc: "Sucess letter a",
-		char: rune('a'),
-		want: true,
-	}, {
-		desc: "Fail letter 1",
-		char: rune('1'),
-		want: false,
-	}}
-
-	for _, test := range tests {
-		got := IsLetter(test.char)
-		if test.want != got {
-			t.Errorf("[%v]: failed got: %v want: %v", test.desc, got, test.want)
-		}
-	}
-}
-
-func TestIsDigit(t *testing.T) {
-	tests := []struct {
-		desc string
-		char rune
-		want bool
-	}{{
-		desc: "Sucess number 1",
-		char: rune('1'),
-		want: true,
-	}, {
-		desc: "Fail number a",
-		char: rune('a'),
-		want: false,
-	}}
-
-	for _, test := range tests {
-		got := isDigit(test.char)
-		if test.want != got {
-			t.Errorf("[%v]: failed got: %v want: %v", test.desc, got, test.want)
-		}
-	}
-}
-
 func TestIsWhitespace(t *testing.T) {
 	tests := []struct {
 		desc string
