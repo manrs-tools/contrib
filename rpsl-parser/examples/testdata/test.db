@@ -1,0 +1,55 @@
+aut-num:        AS10279
+as-name:        WCCOM-AS
+descr:          WEST CAROLINA COMM, LLC
+descr:          229 Hwy 28 By-Pass
+descr:          Abbeville, SC 29620
+descr:          US
+admin-c:        WCTEL1-ARIN
+tech-c:         TWN1-ARIN
+mnt-by:         MNT-WCCL-3
+changed:        tom.nickles@wctel.com 20191217
+source:         ARIN
+
+aut-num:        AS10302
+as-name:        NEGIA-AS
+descr:          Snappy Internet & Telecom
+descr:          Miami, Florida
+member-of:      AS-NEGIA-BACKBONE
+tech-c:         FI14-ARIN
+admin-c:        FI14-ARIN
+mnt-by:         MNT-COFS
+notify:         faisal@snappytelecom.net
+changed:        faisal@snappytelecom.net 20110920
+source:         ARIN
+
+aut-num:        AS10352
+as-name:        SOLARUS-AS
+descr:          Solarus
+                440 E Grand Avenue
+                Wisconsin Rapids WI 54494
+                United States
+mp-export:      afi any.unicast to AS-ANY announce AS-10352ALL
+admin-c:        NEO4-ARIN
+tech-c:         JSL85-ARIN
+tech-c:         NEO4-ARIN
+mnt-by:         MNT-WCTC
+created:        2021-07-08T11:59:46Z
+last-modified:  2021-07-08T11:59:46Z
+source:         ARIN
+
+aut-num:        AS10381
+as-name:        SWCP-AS
+descr:          Southwest Cyberport, Inc
+                5021 Indian School NE
+                Suite 600
+                Albuquerque NM 87110
+                United States
+admin-c:        JKC3-ARIN
+tech-c:         COSTL2-ARIN
+tech-c:         JKC3-ARIN
+tech-c:         MC143-ARIN
+tech-c:         NOS19-ARIN
+mnt-by:         MNT-SWCP
+created:        2020-07-07T21:45:24Z
+last-modified:  2021-10-07T17:53:59Z
+source:         ARIN
